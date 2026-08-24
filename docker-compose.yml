@@ -1,0 +1,52 @@
+version: '3.8'
+
+# Chạy nhanh MySQL + Backend bằng Docker (tùy chọn — không bắt buộc phải dùng Docker).
+# Cách dùng:
+#   1. docker compose up -d
+#   2. docker compose exec backend npm run seed   (nạp dữ liệu mẫu lần đầu)
+#   3. Mở frontend/index.html bằng Live Server (xem README.md)
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fitcore-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: fitcore
+    ports:
+      - "3306:3306"
+    volumes:
+      - fitcore_mysql_data:/var/lib/mysql
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: fitcore-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      CORS_ORIGIN: "*"
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root_password
+      DB_NAME: fitcore
+      JWT_SECRET: change_this_to_a_long_random_secret_in_production
+      JWT_EXPIRES_IN: 7d
+      BANK_BIN: 970422
+      BANK_ACCOUNT_NUMBER: 0346941158
+      BANK_ACCOUNT_NAME: DIEP QUANG TRUONG
+    ports:
+      - "4000:4000"
+
+volumes:
+  fitcore_mysql_data:
