@@ -9,11 +9,13 @@ function daysBetween(a, b) { return Math.round((new Date(b) - new Date(a)) / 864
 function toast(msg, isErr) {
   const wrap = document.getElementById('toastWrap');
   const el = document.createElement('div');
-  el.className = 'toast';
-  if (isErr) el.style.borderLeftColor = 'var(--signal)';
-  el.textContent = msg;
+  el.className = 'toast' + (isErr ? ' toast-err' : ' toast-ok');
+  const icon = isErr
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>';
+  el.innerHTML = `<span class="toast-icon">${icon}</span><span>${msg}</span>`;
   wrap.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 2600);
+  setTimeout(() => { el.classList.add('toast-out'); setTimeout(() => el.remove(), 250); }, 3200);
 }
 
 function openModal(html) {
@@ -44,6 +46,20 @@ function pkgStatusBadge(status, daysLeft) {
   if (status === 'expired') return `<span class="badge badge-danger">Đã hết hạn</span>`;
   if (status === 'expiring') return `<span class="badge badge-warn">Sắp hết hạn${daysLeft != null ? ` (${daysLeft}n)` : ''}</span>`;
   return `<span class="badge badge-ok">Đang hoạt động</span>`;
+}
+
+/** Trạng thái rỗng có icon minh họa — dùng cho danh sách/bảng chưa có dữ liệu, thay cho dòng chữ đơn điệu. */
+const EMPTY_ICONS = {
+  calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 3v3"/><path d="M16 3v3"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/>',
+  box: '<path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  chat: '<path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.6 8.6 0 0 1-3.9-.9L3 20l1.1-5.1a8.4 8.4 0 0 1-1-4 8.4 8.4 0 0 1 8.9-8.4 8.5 8.5 0 0 1 9 8.4Z"/>',
+  inbox: '<path d="M3 12h4l2 3h6l2-3h4"/><path d="M5 5h14l2 7v7H3v-7l2-7Z"/>',
+};
+function emptyState(type, text) {
+  const paths = EMPTY_ICONS[type] || EMPTY_ICONS.inbox;
+  return `<div class="empty-state"><svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</svg><div class="empty-title">${text}</div></div>`;
 }
 
 /** Hiển thị thông báo lỗi thân thiện khi 1 lời gọi API thất bại (dùng trong catch) */
