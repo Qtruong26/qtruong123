@@ -17,7 +17,9 @@ router.get('/', async (req, res, next) => {
       pending: rows.filter((u) => u.pending),
       staff: rows.filter((u) => !u.pending),
     });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 /** POST /api/staff — Admin thêm nhân viên trực tiếp (kích hoạt ngay, không cần duyệt) */
@@ -57,12 +59,75 @@ router.post('/', async (req, res, next) => {
   }
 });
 
+/** POST /api/staff/promote-to-trainer — Admin thăng chức Hội viên lên HLV */
+router.post('/promote-to-trainer', async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const { userId, specialty, workDays } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Thiếu ID người dùng.' });
+    }
+
+    // 1. Kiểm tra tài khoản người dùng
+    const [users] = await conn.query('SELECT * FROM users WHERE id = ?', [userId]);
+    if (!users.length) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    }
+
+    const targetUser = users[0];
+
+    if (targetUser.role === 'trainer') {
+      return res.status(400).json({ message: 'Người dùng này đã là Huấn luyện viên.' });
+    }
+
+    await conn.beginTransaction();
+
+    let trainerId = targetUser.trainer_id;
+
+    // 2. Tạo hồ sơ HLV mới nếu chưa liên kết
+    if (!trainerId) {
+      const [tResult] = await conn.query(
+        'INSERT INTO trainers (name, phone, specialty, work_days) VALUES (?, ?, ?, ?)',
+        [
+          targetUser.name,
+          targetUser.phone || '',
+          specialty || 'Chưa cập nhật',
+          workDays || ''
+        ]
+      );
+      trainerId = tResult.insertId;
+    }
+
+    // 3. Đổi role thành trainer, gắn trainer_id và mở khóa tài khoản
+    await conn.query(
+      'UPDATE users SET role = "trainer", trainer_id = ?, pending = 0 WHERE id = ?',
+      [trainerId, userId]
+    );
+
+    await conn.commit();
+
+    return res.json({
+      message: `Đã thăng chức ${targetUser.name} thành Huấn luyện viên thành công!`,
+      trainerId
+    });
+
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
 /** POST /api/staff/:id/approve — phê duyệt tài khoản tự đăng ký */
 router.post('/:id/approve', async (req, res, next) => {
   try {
     await pool.query('UPDATE users SET pending = 0 WHERE id = ?', [req.params.id]);
     res.json({ message: 'Đã phê duyệt nhân viên.' });
-  } catch (err) { next(err); }
+  } catch (err) { 
+    next(err); 
+  }
 });
 
 /** DELETE /api/staff/:id — từ chối yêu cầu đăng ký HOẶC cho nhân viên đang làm việc thôi việc */
@@ -76,7 +141,6 @@ router.delete('/:id', async (req, res, next) => {
     await conn.beginTransaction();
     await conn.query('DELETE FROM users WHERE id = ?', [req.params.id]);
     if (user.trainer_id) {
-      // Xóa hồ sơ HLV liên kết (nếu không còn tài khoản nào khác dùng chung — trường hợp demo 1-1)
       await conn.query('DELETE FROM trainers WHERE id = ?', [user.trainer_id]);
     }
     await conn.commit();
