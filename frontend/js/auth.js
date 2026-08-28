@@ -54,14 +54,15 @@ async function doLogin(event) {
   const loginErr = document.getElementById('loginError');
   if (loginErr) loginErr.classList.remove('show');
 
-  const usernameInput = document.getElementById('login-phone') || document.getElementById('loginUser');
+  // Lấy giá trị Username từ ô input
+  const usernameInput = document.getElementById('login-username') || document.getElementById('login-phone') || document.getElementById('loginUser');
   const passwordInput = document.getElementById('login-password') || document.getElementById('loginPass');
 
   const username = usernameInput ? usernameInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value : '';
 
   if (!username || !password) {
-    showFieldError('loginError', 'Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
+    showFieldError('loginError', 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
     return;
   }
 
@@ -87,17 +88,24 @@ async function doRegister(event) {
   const roleEl = document.getElementById('regRole');
   const role = roleEl ? roleEl.value : 'member';
 
+  const usernameInput = document.getElementById('reg-username') || document.getElementById('regUsername');
   const nameInput = document.getElementById('reg-name') || document.getElementById('regName');
   const phoneInput = document.getElementById('reg-phone') || document.getElementById('regPhone');
   const emailInput = document.getElementById('reg-email') || document.getElementById('regEmail');
   const passInput = document.getElementById('reg-password') || document.getElementById('regPass');
   const pass2Input = document.getElementById('reg-confirm-password') || document.getElementById('regPass2');
 
+  const username = usernameInput ? usernameInput.value.trim() : '';
   const name = nameInput ? nameInput.value.trim() : '';
   const phone = phoneInput ? phoneInput.value.trim() : '';
   const email = emailInput ? emailInput.value.trim() : '';
   const password = passInput ? passInput.value : '';
   const pass2 = pass2Input ? pass2Input.value : '';
+
+  if (!username) {
+    showFieldError('regError', 'Vui lòng nhập Tên đăng nhập.');
+    return;
+  }
 
   if (password !== pass2) {
     showFieldError('regError', 'Xác nhận mật khẩu không khớp.');
@@ -105,12 +113,12 @@ async function doRegister(event) {
   }
 
   try {
-    const data = await Api.post('/auth/register', { role, name, phone, email, password });
+    const data = await Api.post('/auth/register', { username, role, name, phone, email, password });
     if (data.pending) {
       if (typeof toast === 'function') toast(data.message);
       switchAuthTab('login');
-      const loginUserInput = document.getElementById('login-phone') || document.getElementById('loginUser');
-      if (loginUserInput) loginUserInput.value = data.username || phone;
+      const loginUserInput = document.getElementById('login-username') || document.getElementById('login-phone') || document.getElementById('loginUser');
+      if (loginUserInput) loginUserInput.value = data.username || username;
     } else {
       if (typeof toast === 'function') toast('Đăng ký thành công! Đang đăng nhập...');
       Auth.setSession(data.token, data.user);

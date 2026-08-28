@@ -61,8 +61,8 @@
     <!-- Form 1: ĐĂNG NHẬP -->
     <form id="form-login" class="auth-form active" onsubmit="doLogin(event)">
       <div class="form-group">
-        <label>TÊN ĐĂNG NHẬP (SỐ ĐIỆN THOẠI)</label>
-        <input type="text" id="login-phone" placeholder="vd: 0912345678" required />
+        <label>TÊN ĐĂNG NHẬP</label>
+        <input type="text" id="login-username" placeholder="vd: user123 hoặc 0912345678" required />
       </div>
 
       <div class="form-group">
@@ -83,7 +83,7 @@
       <button type="submit" class="submit-btn">Đăng nhập</button>
     </form>
 
-    <!-- Form 2: ĐĂNG KÝ (Đã thêm chọn 3 vai trò) -->
+    <!-- Form 2: ĐĂNG KÝ -->
     <form id="form-register" class="auth-form" onsubmit="doRegister(event)">
       <div class="form-group">
         <label>VAI TRÒ TÀI KHOẢN</label>
@@ -92,6 +92,11 @@
           <option value="trainer">Huấn luyện viên (PT)</option>
           <option value="reception">Lễ tân</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label>TÊN ĐĂNG NHẬP</label>
+        <input type="text" id="reg-username" placeholder="vd: user123 (dùng để đăng nhập)" required />
       </div>
 
       <div class="form-group">

@@ -10,20 +10,27 @@ const router = express.Router();
 /**
  * POST /api/auth/register
  *
- * Một số điện thoại có thể đăng ký nhiều tài khoản.
- * Username được tạo tự động và không còn chính là số điện thoại.
+ * Người dùng tự chọn username.
+ * Username là duy nhất, một số điện thoại có thể đăng ký nhiều tài khoản.
  */
 router.post('/register', async (req, res, next) => {
   const conn = await pool.getConnection();
 
   try {
-    const { role, name, phone, email, password } = req.body;
+    const { role, name, phone, email, password, username } = req.body;
 
     const phoneNumber = (phone || '').trim();
+    const rawUsername = (username || '').trim();
 
     if (!['member', 'reception', 'trainer'].includes(role)) {
       return res.status(400).json({
         message: 'Vai trò đăng ký không hợp lệ.'
+      });
+    }
+
+    if (!rawUsername || rawUsername.length < 3) {
+      return res.status(400).json({
+        message: 'Vui lòng nhập Tên đăng nhập (tối thiểu 3 ký tự).'
       });
     }
 
@@ -42,6 +49,18 @@ router.post('/register', async (req, res, next) => {
     if (!password || password.length < 6) {
       return res.status(400).json({
         message: 'Mật khẩu cần tối thiểu 6 ký tự.'
+      });
+    }
+
+    // Kiểm tra xem Username đã tồn tại trong hệ thống chưa
+    const [existingUsers] = await conn.query(
+      'SELECT id FROM users WHERE username = ?',
+      [rawUsername]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({
+        message: 'Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.'
       });
     }
 
@@ -91,21 +110,12 @@ router.post('/register', async (req, res, next) => {
     // Mã hóa mật khẩu
     const passwordHash = await bcrypt.hash(password, 10);
 
-    /*
-     * Tạo username riêng cho từng tài khoản.
-     *
-     * Ví dụ:
-     * 0123456789_1723456789123
-     * 0123456789_1723456790456
-     */
-    const username = `${phoneNumber}_${Date.now()}`;
-
     const [userResult] = await conn.query(
       `INSERT INTO users
       (username, phone, password_hash, role, name, member_id, trainer_id, pending)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        username,
+        rawUsername,
         phoneNumber,
         passwordHash,
         role,
@@ -123,7 +133,7 @@ router.post('/register', async (req, res, next) => {
       return res.status(201).json({
         pending: true,
         message: 'Đăng ký thành công! Tài khoản đang chờ Quản lý phê duyệt.',
-        username,
+        username: rawUsername,
         phone: phoneNumber
       });
     }
@@ -131,7 +141,7 @@ router.post('/register', async (req, res, next) => {
     // Hội viên đăng ký thành công
     const token = signToken({
       id: userResult.insertId,
-      username,
+      username: rawUsername,
       phone: phoneNumber,
       role,
       name: name.trim(),
@@ -144,7 +154,7 @@ router.post('/register', async (req, res, next) => {
       token,
       user: {
         id: userResult.insertId,
-        username,
+        username: rawUsername,
         phone: phoneNumber,
         role,
         name: name.trim(),
@@ -165,11 +175,8 @@ router.post('/register', async (req, res, next) => {
 /**
  * POST /api/auth/login
  *
- * Đăng nhập bằng:
- * Số điện thoại + mật khẩu
- *
- * Nếu một số điện thoại có nhiều tài khoản,
- * hệ thống sẽ kiểm tra mật khẩu để tìm đúng tài khoản.
+ * Đăng nhập chuẩn bằng:
+ * Tên đăng nhập (username) + mật khẩu
  */
 router.post('/login', async (req, res, next) => {
   try {
@@ -177,42 +184,32 @@ router.post('/login', async (req, res, next) => {
 
     if (!username || !password) {
       return res.status(400).json({
-        message: 'Thiếu số điện thoại hoặc mật khẩu.'
+        message: 'Vui lòng nhập tên đăng nhập và mật khẩu.'
       });
     }
 
-    const phoneNumber = username.trim();
+    const inputUsername = username.trim();
 
-    // Lấy tất cả tài khoản có cùng số điện thoại
+    // Tìm tài khoản chính xác theo Username
     const [rows] = await pool.query(
-      'SELECT * FROM users WHERE phone = ?',
-      [phoneNumber]
+      'SELECT * FROM users WHERE username = ?',
+      [inputUsername]
     );
 
     if (!rows.length) {
       return res.status(401).json({
-        message: 'Không tìm thấy tài khoản.'
+        message: 'Tên đăng nhập hoặc mật khẩu không chính xác.'
       });
     }
 
-    let user = null;
+    const user = rows[0];
 
-    // Kiểm tra mật khẩu từng tài khoản
-    for (const row of rows) {
-      const ok = await bcrypt.compare(
-        password,
-        row.password_hash
-      );
+    // Kiểm tra mật khẩu
+    const ok = await bcrypt.compare(password, user.password_hash);
 
-      if (ok) {
-        user = row;
-        break;
-      }
-    }
-
-    if (!user) {
+    if (!ok) {
       return res.status(401).json({
-        message: 'Số điện thoại hoặc mật khẩu không đúng.'
+        message: 'Tên đăng nhập hoặc mật khẩu không chính xác.'
       });
     }
 
