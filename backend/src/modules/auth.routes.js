@@ -95,9 +95,8 @@ router.post('/register', async (req, res, next) => {
      * Tạo username riêng cho từng tài khoản.
      *
      * Ví dụ:
-     * 0123456789_1
-     * 0123456789_2
-     * 0123456789_3
+     * 0123456789_1723456789123
+     * 0123456789_1723456790456
      */
     const username = `${phoneNumber}_${Date.now()}`;
 
