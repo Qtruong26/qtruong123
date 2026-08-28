@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FitCore — Hệ thống quản lý trung tâm thể hình + AI</title>
+  <meta name="theme-color" content="#12151A">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='8' fill='%23C6FF3A'/%3E%3Ctext x='17' y='24' font-family='Arial,sans-serif' font-weight='700' font-size='16' text-anchor='middle' fill='%2312151A'%3EFC%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,124 +23,110 @@
 
 <!-- ===================== LOGIN / REGISTER ===================== -->
 <div id="loginScreen">
+  <!-- Khung minh họa bên trái với ảnh Gym AI hiện đại -->
   <div class="login-illustration">
-    <div class="illu-grid"></div>
-    <div class="illu-glow"></div>
-    <svg class="illu-art" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <g stroke="#C6FF3A" stroke-width="6" stroke-linecap="round"><line x1="70" y1="260" x2="450" y2="260"/></g>
-      <g fill="#EDEFF3" opacity="0.92">
-        <rect x="40" y="220" width="26" height="80" rx="6"/>
-        <rect x="70" y="235" width="16" height="50" rx="5"/>
-        <rect x="454" y="220" width="26" height="80" rx="6"/>
-        <rect x="434" y="235" width="16" height="50" rx="5"/>
-      </g>
-      <g fill="#5B7CFA" opacity="0.85">
-        <rect x="95" y="205" width="20" height="110" rx="6"/>
-        <rect x="405" y="205" width="20" height="110" rx="6"/>
-      </g>
-      <circle cx="260" cy="260" r="5" fill="#C6FF3A"/>
-      <circle cx="260" cy="260" r="190" stroke="#323847" stroke-width="1.5" fill="none" stroke-dasharray="4 8" opacity="0.6"/>
-      <circle cx="260" cy="260" r="230" stroke="#323847" stroke-width="1" fill="none" stroke-dasharray="2 10" opacity="0.35"/>
-    </svg>
+    <img 
+      src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop" 
+      alt="FitCore AI Fitness" 
+      class="illu-image"
+    />
     <div class="illu-content">
       <div class="illu-eyebrow">FITCORE GYM PLATFORM</div>
       <div class="illu-title">TẬP LUYỆN THÔNG MINH HƠN<br>CÙNG TRỢ LÝ AI</div>
       <div class="illu-desc">Quản lý hội viên, gói tập, huấn luyện viên và lịch tập — tất cả trong một nền tảng duy nhất, hỗ trợ bởi AI.</div>
       <div class="illu-stats">
-        <div class="illu-stat"><div class="illu-stat-num">4</div><div class="illu-stat-label">Vai trò sử dụng</div></div>
+        <div class="illu-stat"><div class="illu-stat-num">3</div><div class="illu-stat-label">Vai trò sử dụng</div></div>
         <div class="illu-stat"><div class="illu-stat-num">AI</div><div class="illu-stat-label">Gợi ý &amp; nhắc lịch</div></div>
         <div class="illu-stat"><div class="illu-stat-num">24/7</div><div class="illu-stat-label">Truy cập mọi lúc</div></div>
       </div>
     </div>
   </div>
 
-  <div class="login-form-side">
-    <div class="login-card">
-      <div class="brand"><div class="brand-mark">FC</div><div class="brand-name">FitCore</div></div>
-      <div class="login-sub">Hệ thống quản lý trung tâm thể hình có tích hợp AI</div>
+  <!-- Khung Form Đăng nhập / Đăng ký -->
+  <div class="auth-box">
+    <div class="auth-brand">
+      <div class="brand-badge">FC</div>
+      <h2>FITCORE</h2>
+    </div>
+    <p class="auth-subtitle">Hệ thống quản lý trung tâm thể hình tích hợp AI</p>
 
-      <div class="auth-tabs" role="tablist">
-        <button type="button" class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Đăng nhập</button>
-        <button type="button" class="auth-tab" id="tabRegister" role="tab" aria-selected="false" onclick="switchAuthTab('register')">Đăng ký tài khoản</button>
+    <div class="tab-switcher">
+      <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
+      <button type="button" class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">Đăng ký tài khoản</button>
+    </div>
+
+    <div id="loginError" class="error-msg" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;"></div>
+    <div id="regError" class="error-msg" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;"></div>
+
+    <!-- Form 1: ĐĂNG NHẬP -->
+    <form id="form-login" class="auth-form active" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>TÊN ĐĂNG NHẬP (SỐ ĐIỆN THOẠI)</label>
+        <input type="text" id="login-phone" placeholder="vd: 0912345678" required />
       </div>
 
-      <!-- Đăng nhập -->
-      <form id="loginPane" onsubmit="event.preventDefault(); doLogin();">
-        <div class="field">
-          <label for="loginUser">Tên đăng nhập (số điện thoại)</label>
-          <input id="loginUser" name="username" type="tel" autocomplete="username" placeholder="vd: 0912345678" required>
+      <div class="form-group">
+        <label>MẬT KHẨU</label>
+        <div class="input-password-wrapper">
+          <input type="password" id="login-password" placeholder="Nhập mật khẩu" required />
+          <span class="toggle-eye" onclick="togglePasswordVisibility('login-password', this)">👁</span>
         </div>
-        <div class="field">
-          <label for="loginPass">Mật khẩu</label>
-          <div class="password-wrap">
-            <input id="loginPass" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('loginPass', this)" aria-label="Hiện/ẩn mật khẩu">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="field-error" id="loginError" aria-live="polite"></div>
-        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
-      </form>
+      </div>
 
-      <!-- Đăng ký -->
-      <form id="registerPane" style="display:none;" onsubmit="event.preventDefault(); doRegister();">
-        <div class="field">
-          <label for="regRole">Bạn đăng ký với vai trò</label>
-          <select id="regRole" name="role">
-            <option value="member">Hội viên</option>
-            <option value="reception">Lễ tân</option>
-            <option value="trainer">Huấn luyện viên</option>
-          </select>
-          <div class="hint">Tài khoản Lễ tân/HLV sẽ ở trạng thái chờ Quản lý phê duyệt.</div>
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" /> Ghi nhớ đăng nhập
+        </label>
+        <a href="#" class="forgot-pass">Quên mật khẩu?</a>
+      </div>
+
+      <button type="submit" class="submit-btn">Đăng nhập</button>
+    </form>
+
+    <!-- Form 2: ĐĂNG KÝ (Đã thêm chọn 3 vai trò) -->
+    <form id="form-register" class="auth-form" onsubmit="doRegister(event)">
+      <div class="form-group">
+        <label>VAI TRÒ TÀI KHOẢN</label>
+        <select id="regRole" class="auth-select">
+          <option value="member">Hội viên (Tập luyện)</option>
+          <option value="trainer">Huấn luyện viên (PT)</option>
+          <option value="reception">Lễ tân</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>HỌ VÀ TÊN</label>
+        <input type="text" id="reg-name" placeholder="vd: Nguyễn Văn A" required />
+      </div>
+
+      <div class="form-group">
+        <label>SỐ ĐIỆN THOẠI</label>
+        <input type="tel" id="reg-phone" placeholder="vd: 0912345678" required />
+      </div>
+
+      <div class="form-group">
+        <label>MẬT KHẨU</label>
+        <div class="input-password-wrapper">
+          <input type="password" id="reg-password" placeholder="Tối thiểu 6 ký tự" required />
+          <span class="toggle-eye" onclick="togglePasswordVisibility('reg-password', this)">👁</span>
         </div>
-        <div class="field">
-          <label for="regName">Họ và tên</label>
-          <input id="regName" name="fullname" type="text" autocomplete="name" placeholder="Nguyễn Văn A" required>
+      </div>
+
+      <div class="form-group">
+        <label>XÁC NHẬN MẬT KHẨU</label>
+        <div class="input-password-wrapper">
+          <input type="password" id="reg-confirm-password" placeholder="Nhập lại mật khẩu" required />
+          <span class="toggle-eye" onclick="togglePasswordVisibility('reg-confirm-password', this)">👁</span>
         </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="regPhone">Số điện thoại</label>
-            <input id="regPhone" name="phone" type="tel" autocomplete="tel" placeholder="09xxxxxxxx" required>
-          </div>
-          <div class="field">
-            <label for="regEmail">Email</label>
-            <input id="regEmail" name="email" type="email" autocomplete="email" placeholder="ban@email.com">
-          </div>
-        </div>
-        <div class="hint" style="margin-bottom:14px;">Số điện thoại sẽ được dùng làm tên đăng nhập của bạn.</div>
-        <div class="form-row">
-          <div class="field">
-            <label for="regPass">Mật khẩu</label>
-            <div class="password-wrap">
-              <input id="regPass" name="new-password" type="password" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự" required>
-              <button type="button" class="password-toggle" onclick="togglePasswordVisibility('regPass', this)" aria-label="Hiện/ẩn mật khẩu">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-          <div class="field">
-            <label for="regPass2">Xác nhận mật khẩu</label>
-            <div class="password-wrap">
-              <input id="regPass2" name="confirm-password" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu" required>
-              <button type="button" class="password-toggle" onclick="togglePasswordVisibility('regPass2', this)" aria-label="Hiện/ẩn mật khẩu">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="field-error" id="regError" aria-live="polite"></div>
-        <button type="submit" class="btn btn-primary btn-block">Tạo tài khoản</button>
-        <div class="hint" style="text-align:center;margin-top:12px;">
-          Đã có tài khoản? <button type="button" class="btn-link" style="color:var(--volt);cursor:pointer;background:none;border:none;padding:0;font:inherit;" onclick="switchAuthTab('login')">Đăng nhập ngay</button>
-        </div>
-      </form>
-    </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Tạo tài khoản</button>
+    </form>
   </div>
 </div>
 
 <!-- ===================== MAIN APPLICATION ===================== -->
-<div id="app">
+<div id="app" style="display: none;">
   <div class="shell">
     <aside class="sidebar">
       <div class="side-brand">
@@ -199,5 +187,12 @@
 <script src="js/views/staff.js"></script>
 
 <script src="js/main.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof restoreSession === 'function') {
+      restoreSession();
+    }
+  });
+</script>
 </body>
 </html>
