@@ -56,15 +56,15 @@ async function seed() {
     console.log('→ Tạo tài khoản đăng nhập (mật khẩu demo: 123456)...');
     const passwordHash = await bcrypt.hash('123456', 10);
     await conn.query(
-      `INSERT INTO users (username, password_hash, role, name, member_id, trainer_id, pending) VALUES
-       (?,?,?,?,?,?,0), (?,?,?,?,?,?,0), (?,?,?,?,?,?,0), (?,?,?,?,?,?,0)`,
-      [
-        'admin', '0988888888', 'admin', 'Diep Quang Truong', null, null,
-        'letan', passwordHash, 'reception', 'Trần Lễ Tân', null, null,
-        'hlv1', passwordHash, 'trainer', 'Lê Huấn Luyện', null, trainerId1,
-        'hv1', passwordHash, 'member', 'Phạm Hội Viên', memberId1, null,
-      ]
-    );
+  `INSERT INTO users (username, phone, password_hash, role, name, member_id, trainer_id, pending) VALUES
+   (?,?,?,?,?,?,?,0), (?,?,?,?,?,?,?,0), (?,?,?,?,?,?,?,0), (?,?,?,?,?,?,?,0)`,
+  [
+    'admin', '0988888888', passwordHash, 'admin', 'Diep Quang Truong', null, null,
+    'letan', '0900000001', passwordHash, 'reception', 'Trần Lễ Tân', null, null,
+    'hlv1',  '0901111222', passwordHash, 'trainer', 'Lê Huấn Luyện', null, trainerId1,
+    'hv1',   '0912345678', passwordHash, 'member', 'Phạm Hội Viên', memberId1, null,
+  ]
+);
 
     console.log('→ Tạo gói tập...');
     const [p1] = await conn.query(`INSERT INTO packages (name, duration_days, price, description) VALUES (?,?,?,?)`,
