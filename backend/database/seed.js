@@ -54,12 +54,12 @@ async function seed() {
     const memberId1 = m1.insertId, memberId2 = m2.insertId, memberId3 = m3.insertId;
 
     console.log('→ Tạo tài khoản đăng nhập (mật khẩu demo: 123456)...');
-    const passwordHash = await bcrypt.hash('Truong1234@', 10);
+    const passwordHash = await bcrypt.hash('123456', 10);
     await conn.query(
       `INSERT INTO users (username, password_hash, role, name, member_id, trainer_id, pending) VALUES
        (?,?,?,?,?,?,0), (?,?,?,?,?,?,0), (?,?,?,?,?,?,0), (?,?,?,?,?,?,0)`,
       [
-        'admin', passwordHash, 'admin', 'Diep Quang Truong', null, null,
+        'admin', '0988888888', 'admin', 'Diep Quang Truong', null, null,
         'letan', passwordHash, 'reception', 'Trần Lễ Tân', null, null,
         'hlv1', passwordHash, 'trainer', 'Lê Huấn Luyện', null, trainerId1,
         'hv1', passwordHash, 'member', 'Phạm Hội Viên', memberId1, null,
