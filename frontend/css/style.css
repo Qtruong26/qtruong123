@@ -750,6 +750,7 @@ body {
     overflow-x: hidden !important;
     width: 100% !important;
   }
+}
 
   /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ */
   #loginScreen,
@@ -916,4 +917,3 @@ body {
     margin: 16px auto !important;
     padding: 20px !important;
   }
-}
