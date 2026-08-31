@@ -741,29 +741,85 @@ body {
 }
 /* =========================================================
    CHỈ ÁP DỤNG CHO ĐIỆN THOẠI & TABLET (MÁY TÍNH GIỮ NGUYÊN)
+ /* =========================================================
+   BỐ CỤC MOBILE HOÀN CHỈNH CHO FITCORE (ĐĂNG NHẬP + MENU TRƯỢT)
    ========================================================= */
 @media (max-width: 768px) {
-  #loginScreen {
+  /* Khóa tràn viền màn hình */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ */
+  #loginScreen,
+  div#loginScreen {
     display: flex !important;
     flex-direction: column !important;
-    padding: 16px !important;
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
+    height: auto !important;
     width: 100% !important;
+    max-width: 100vw !important;
+    padding: 20px 16px !important;
+    margin: 0 !important;
+    grid-template-columns: 1fr !important;
+    box-sizing: border-box !important;
   }
 
-  .login-illustration {
+  .login-illustration,
+  #loginScreen .login-illustration {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 
-  .auth-box {
+  .auth-box,
+  #loginScreen .auth-box {
+    display: block !important;
     width: 100% !important;
     max-width: 420px !important;
-    padding: 24px 20px !important;
-    border-radius: 16px;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 24px 18px !important;
+    box-sizing: border-box !important;
+    border-radius: 16px !important;
   }
 
+  .auth-form {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .auth-form .form-group {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .auth-form input,
+  .auth-form select {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important;
+  }
+
+  .tab-switcher {
+    width: 100% !important;
+    display: flex !important;
+    box-sizing: border-box !important;
+  }
+
+  .tab-btn {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  /* 2. KHUNG ỨNG DỤNG CHÍNH VÀ MENU TRƯỢT (GIỮ NGUYÊN HOẠT ĐỘNG TỐT) */
   .shell {
     flex-direction: column !important;
     min-height: 100vh !important;
@@ -795,7 +851,7 @@ body {
     cursor: pointer !important;
   }
 
-  /* SIDEBAR DI ĐỘNG (DÙNG ID ĐỂ CÓ ĐỘ ƯU TIÊN CAO NHẤT) */
+  /* SIDEBAR DI ĐỘNG */
   #sidebar,
   aside.sidebar {
     display: flex !important;
@@ -836,10 +892,13 @@ body {
   .main {
     padding: 16px 12px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
     overflow-x: hidden !important;
   }
 
-  .stats-grid, .cards-grid, .dashboard-grid {
+  .stats-grid, 
+  .cards-grid, 
+  .dashboard-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
@@ -849,5 +908,12 @@ body {
     width: 100% !important;
     overflow-x: auto !important;
     white-space: nowrap !important;
+  }
+
+  .modal {
+    width: 92% !important;
+    max-width: 92% !important;
+    margin: 16px auto !important;
+    padding: 20px !important;
   }
 }
