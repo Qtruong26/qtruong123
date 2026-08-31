@@ -192,5 +192,36 @@
 <script src="js/views/staff.js"></script>
 
 <script src="js/main.js"></script>
+<script>
+  // Hàm mở/đóng menu trượt
+  function toggleMobileNav() {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('mobileNavOverlay');
+    if (!sidebar || !overlay) {
+      console.warn('Không tìm thấy sidebar hoặc overlay');
+      return;
+    }
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('show');
+  }
+
+  // Tự đóng khi bấm vào tab bất kỳ
+  document.addEventListener('click', function(e) {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('mobileNavOverlay');
+    if (!sidebar || !overlay) return;
+
+    if (e.target.closest('#navGroup') || e.target.closest('.logout-link')) {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('show');
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', function() {
+    if (typeof restoreSession === 'function') {
+      restoreSession();
+    }
+  });
+</script>
 </body>
 </html>

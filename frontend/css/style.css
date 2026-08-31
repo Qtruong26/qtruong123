@@ -743,7 +743,6 @@ body {
    CHỈ ÁP DỤNG CHO ĐIỆN THOẠI & TABLET (MÁY TÍNH GIỮ NGUYÊN)
    ========================================================= */
 @media (max-width: 768px) {
-  /* 1. Màn hình đăng nhập gọn gàng trên mobile */
   #loginScreen {
     display: flex !important;
     flex-direction: column !important;
@@ -760,108 +759,95 @@ body {
 
   .auth-box {
     width: 100% !important;
-    max-width: 420px;
+    max-width: 420px !important;
     padding: 24px 20px !important;
     border-radius: 16px;
   }
 
-  /* 2. Khung ứng dụng chính */
   .shell {
-    flex-direction: column;
-    min-height: 100vh;
+    flex-direction: column !important;
+    min-height: 100vh !important;
   }
 
-  /* 3. Topbar trên mobile kèm nút 3 gạch */
   .mobile-topbar {
     display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #181c24;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    position: sticky;
-    top: 0;
-    z-index: 900;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    background: #181c24 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 900 !important;
   }
 
   .mobile-menu-btn {
     display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
     background: #232834 !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     color: #fff !important;
-    font-size: 22px !important;
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    cursor: pointer;
+    font-size: 24px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
   }
 
-  /* 4. Sidebar menu trượt (Dùng transform thay vì display:none) */
-  .sidebar {
+  /* SIDEBAR DI ĐỘNG (DÙNG ID ĐỂ CÓ ĐỘ ƯU TIÊN CAO NHẤT) */
+  #sidebar,
+  aside.sidebar {
     display: flex !important;
     position: fixed !important;
     top: 0 !important;
-    left: 0 !important;
+    left: -300px !important;
     width: 270px !important;
     height: 100vh !important;
     max-height: 100vh !important;
     background: #14171f !important;
-    z-index: 99999 !important;
-    transform: translateX(-100%) !important; /* Ẩn sang bên trái màn hình */
-    transition: transform 0.25s ease-in-out !important;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.7) !important;
+    z-index: 999999 !important;
+    transition: left 0.25s ease-in-out !important;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.8) !important;
     overflow-y: auto !important;
   }
 
-  /* Khi bấm nút 3 gạch sẽ kích hoạt class này để trượt ra */
-  .sidebar.mobile-open {
-    transform: translateX(0) !important;
+  #sidebar.mobile-open,
+  aside.sidebar.mobile-open {
+    left: 0 !important;
   }
 
-  /* 5. Lớp nền tối mờ che màn hình khi mở menu */
+  /* LỚP PHỦ MỜ KHI MỞ MENU */
+  #mobileNavOverlay,
   .mobile-nav-overlay {
     display: none;
     position: fixed !important;
     inset: 0 !important;
-    background: rgba(0, 0, 0, 0.65) !important;
-    z-index: 99990 !important;
-    backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.7) !important;
+    z-index: 999990 !important;
+    backdrop-filter: blur(2px) !important;
   }
 
+  #mobileNavOverlay.show,
   .mobile-nav-overlay.show {
     display: block !important;
   }
 
-  /* 6. Nội dung chính & Bảng */
   .main {
     padding: 16px 12px !important;
-    width: 100%;
-    overflow-x: hidden;
+    width: 100% !important;
+    overflow-x: hidden !important;
   }
 
-  .stats-grid, 
-  .cards-grid, 
-  .dashboard-grid {
+  .stats-grid, .cards-grid, .dashboard-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
 
-  .table-responsive,
-  .table-wrap,
   table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-  }
-
-  .modal {
-    width: 92% !important;
-    max-width: 92% !important;
-    margin: 16px auto;
-    padding: 20px !important;
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
   }
 }
