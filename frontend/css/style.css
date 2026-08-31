@@ -744,7 +744,7 @@ body {
    ========================================================= */
 @media (max-width: 768px) {
   /* 1. Màn hình đăng nhập gọn gàng trên mobile */
- #loginScreen {
+  #loginScreen {
     display: flex !important;
     flex-direction: column !important;
     padding: 16px !important;
@@ -771,10 +771,7 @@ body {
     min-height: 100vh;
   }
 
-  .sidebar {
-    display: none !important;
-  }
-
+  /* 3. Topbar trên mobile kèm nút 3 gạch */
   .mobile-topbar {
     display: flex !important;
     justify-content: space-between;
@@ -784,16 +781,66 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 900;
   }
 
+  .mobile-menu-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #232834 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    font-size: 22px !important;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* 4. Sidebar menu trượt (Dùng transform thay vì display:none) */
+  .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 270px !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    background: #14171f !important;
+    z-index: 99999 !important;
+    transform: translateX(-100%) !important; /* Ẩn sang bên trái màn hình */
+    transition: transform 0.25s ease-in-out !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.7) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Khi bấm nút 3 gạch sẽ kích hoạt class này để trượt ra */
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  /* 5. Lớp nền tối mờ che màn hình khi mở menu */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    z-index: 99990 !important;
+    backdrop-filter: blur(2px);
+  }
+
+  .mobile-nav-overlay.show {
+    display: block !important;
+  }
+
+  /* 6. Nội dung chính & Bảng */
   .main {
     padding: 16px 12px !important;
     width: 100%;
     overflow-x: hidden;
   }
 
-  /* 3. Lưới hiển thị & Cuộn bảng ngang */
   .stats-grid, 
   .cards-grid, 
   .dashboard-grid {
