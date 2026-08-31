@@ -750,11 +750,11 @@ body {
     overflow-x: hidden !important;
     width: 100% !important;
   }
-}
+
 
   /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ */
-  #loginScreen,
-  div#loginScreen {
+ /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ (CHỈ ÁP DỤNG KHI CHƯA BỊ ẨN) */
+  #loginScreen:not([style*="display: none"]) {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -917,3 +917,4 @@ body {
     margin: 16px auto !important;
     padding: 20px !important;
   }
+}
