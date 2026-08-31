@@ -765,6 +765,101 @@ body {
   display: flex !important;
   flex-direction: row !important;
 }
+/* 1. Mở rộng khung nền và vỏ bọc ngoài cùng */
+html, body {
+  width: 100% !important;
+  min-height: 100vh !important;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  width: 100% !important;
+  min-height: 100vh !important;
+  display: flex !important;
+}
+
+.shell {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+}
+
+/* 2. Khung nội dung chính chiếm toàn bộ phần màn hình còn lại */
+.main {
+  flex: 1 1 0% !important;
+  width: calc(100% - 270px) !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  padding: 32px 40px !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. Tất cả các View / Tab / Section con tự động kéo dãn 100% */
+.view,
+.tab-pane,
+section,
+.view-section,
+#viewContent,
+.dashboard-view {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 4. Toàn bộ Header các trang (Tiêu đề, thanh tìm kiếm, nút thêm mới) */
+.page-header,
+.view-header,
+.section-header,
+.toolbar,
+.filter-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 24px !important;
+  box-sizing: border-box !important;
+}
+
+/* 5. Toàn bộ Thẻ Card, Khung Panel, Hộp Box */
+.card,
+.table-card,
+.content-card,
+.panel,
+.box,
+.stat-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 6. Toàn bộ Bảng dữ liệu và Khung bọc bảng */
+.table-responsive,
+.table-wrap,
+.table-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+table,
+.data-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+/* 7. Lưới thống kê trên Dashboard (Tự chia đều 4 hoặc 3 cột theo chiều rộng máy tính) */
+.stats-grid,
+.dashboard-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  width: 100% !important;
+  gap: 20px !important;
+  box-sizing: border-box !important;
+}
 
 /* =========================================================
    2. BỐ CỤC DI ĐỘNG (CHỈ KÍCH HOẠT DƯỚI 768PX)
@@ -935,103 +1030,4 @@ body {
     margin: 16px auto !important;
     padding: 20px !important;
   }
-}
-/* =========================================================
-   ÉP TOÀN BỘ GIAO DIỆN HỆ THỐNG FULL-WIDTH 100% TRÊN MÁY TÍNH
-   ========================================================= */
-
-/* 1. Mở rộng khung nền và vỏ bọc ngoài cùng */
-html, body {
-  width: 100% !important;
-  min-height: 100vh !important;
-  margin: 0;
-  padding: 0;
-}
-
-#app {
-  width: 100% !important;
-  min-height: 100vh !important;
-  display: flex !important;
-}
-
-.shell {
-  display: flex !important;
-  flex-direction: row !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-}
-
-/* 2. Khung nội dung chính chiếm toàn bộ phần màn hình còn lại */
-.main {
-  flex: 1 1 0% !important;
-  width: calc(100% - 270px) !important;
-  max-width: none !important;
-  min-height: 100vh !important;
-  padding: 32px 40px !important;
-  box-sizing: border-box !important;
-}
-
-/* 3. Tất cả các View / Tab / Section con tự động kéo dãn 100% */
-.view,
-.tab-pane,
-section,
-.view-section,
-#viewContent,
-.dashboard-view {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* 4. Toàn bộ Header các trang (Tiêu đề, thanh tìm kiếm, nút thêm mới) */
-.page-header,
-.view-header,
-.section-header,
-.toolbar,
-.filter-bar {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-bottom: 24px !important;
-  box-sizing: border-box !important;
-}
-
-/* 5. Toàn bộ Thẻ Card, Khung Panel, Hộp Box */
-.card,
-.table-card,
-.content-card,
-.panel,
-.box,
-.stat-card {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* 6. Toàn bộ Bảng dữ liệu và Khung bọc bảng */
-.table-responsive,
-.table-wrap,
-.table-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: auto !important;
-}
-
-table,
-.data-table {
-  width: 100% !important;
-  max-width: 100% !important;
-  border-collapse: collapse !important;
-}
-
-/* 7. Lưới thống kê trên Dashboard (Tự chia đều 4 hoặc 3 cột theo chiều rộng máy tính) */
-.stats-grid,
-.dashboard-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-  width: 100% !important;
-  gap: 20px !important;
-  box-sizing: border-box !important;
 }
