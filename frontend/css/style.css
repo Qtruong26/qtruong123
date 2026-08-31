@@ -742,19 +742,31 @@ body {
 /* =========================================================
    CHỈ ÁP DỤNG CHO ĐIỆN THOẠI & TABLET (MÁY TÍNH GIỮ NGUYÊN)
  /* =========================================================
-   BỐ CỤC MOBILE HOÀN CHỈNH CHO FITCORE (ĐĂNG NHẬP + MENU TRƯỢT)
+ /* =========================================================
+   1. BẢO VỆ GIAO DIỆN MÁY TÍNH (DESKTOP)
    ========================================================= */
-@media (max-width: 768px) {
-  /* Khóa tràn viền màn hình */
+.mobile-topbar,
+.mobile-nav-overlay,
+.mobile-menu-btn {
+  display: none !important;
+}
+
+.shell {
+  display: flex !important;
+  flex-direction: row !important;
+}
+
+/* =========================================================
+   2. BỐ CỤC DI ĐỘNG (CHỈ KÍCH HOẠT DƯỚI 768PX)
+   ========================================================= */
+@media screen and (max-width: 768px) {
   html, body {
     overflow-x: hidden !important;
     width: 100% !important;
   }
 
-
-  /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ */
- /* 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ (CHỈ ÁP DỤNG KHI CHƯA BỊ ẨN) */
-  #loginScreen:not([style*="display: none"]) {
+  /* MÀN HÌNH ĐĂNG NHẬP (Chỉ can thiệp khi chưa đăng nhập) */
+  #loginScreen:not([style*="display: none"]):not([style*="display:none"]) {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -792,11 +804,7 @@ body {
     border-radius: 16px !important;
   }
 
-  .auth-form {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
+  .auth-form,
   .auth-form .form-group {
     width: 100% !important;
     box-sizing: border-box !important;
@@ -820,12 +828,13 @@ body {
     text-align: center !important;
   }
 
-  /* 2. KHUNG ỨNG DỤNG CHÍNH VÀ MENU TRƯỢT (GIỮ NGUYÊN HOẠT ĐỘNG TỐT) */
+  /* KHUNG ỨNG DỤNG CHÍNH */
   .shell {
     flex-direction: column !important;
     min-height: 100vh !important;
   }
 
+  /* THANH TOPBAR VÀ NÚT MENU */
   .mobile-topbar {
     display: flex !important;
     justify-content: space-between !important;
@@ -852,7 +861,7 @@ body {
     cursor: pointer !important;
   }
 
-  /* SIDEBAR DI ĐỘNG */
+  /* SIDEBAR MENU TRƯỢT */
   #sidebar,
   aside.sidebar {
     display: flex !important;
@@ -874,10 +883,9 @@ body {
     left: 0 !important;
   }
 
-  /* LỚP PHỦ MỜ KHI MỞ MENU */
-  #mobileNavOverlay,
+  /* LỚP PHỦ NỀN ĐEN MỜ */
   .mobile-nav-overlay {
-    display: none;
+    display: none !important;
     position: fixed !important;
     inset: 0 !important;
     background: rgba(0, 0, 0, 0.7) !important;
@@ -885,11 +893,11 @@ body {
     backdrop-filter: blur(2px) !important;
   }
 
-  #mobileNavOverlay.show,
   .mobile-nav-overlay.show {
     display: block !important;
   }
 
+  /* KHUNG NỘI DUNG VÀ BẢNG */
   .main {
     padding: 16px 12px !important;
     width: 100% !important;
