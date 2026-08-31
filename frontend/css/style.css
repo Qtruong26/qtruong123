@@ -744,12 +744,14 @@ body {
    ========================================================= */
 @media (max-width: 768px) {
   /* 1. Màn hình đăng nhập gọn gàng trên mobile */
-  #loginScreen {
-    flex-direction: column;
-    padding: 16px;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+ #loginScreen {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    width: 100% !important;
   }
 
   .login-illustration {
