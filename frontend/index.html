@@ -192,20 +192,5 @@
 <script src="js/views/staff.js"></script>
 
 <script src="js/main.js"></script>
-<script>
-  function toggleMobileNav() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('mobileNavOverlay');
-    if (!sidebar || !overlay) return;
-    sidebar.classList.toggle('mobile-open');
-    overlay.classList.toggle('show');
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    if (typeof restoreSession === 'function') {
-      restoreSession();
-    }
-  });
-</script>
 </body>
 </html>
