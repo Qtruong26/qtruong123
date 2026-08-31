@@ -2,21 +2,17 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FitCore — Hệ thống quản lý trung tâm thể hình + AI</title>
   <meta name="theme-color" content="#12151A">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='8' fill='%23C6FF3A'/%3E%3Ctext x='17' y='24' font-family='Arial,sans-serif' font-weight='700' font-size='16' text-anchor='middle' fill='%2312151A'%3EFC%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="css/style.css?v=99">
+  <link rel="stylesheet" href="css/style.css?v=100">
   <script>
-    // Cấu hình URL Backend (chọn 1 môi trường phù hợp)
-    // Production (Railway):
+    // Cấu hình URL Backend
     window.FITCORE_API_BASE_URL = 'https://qtruong123-production.up.railway.app/api';
-    
-    // Development (Localhost/LAN) - bỏ comment khi test nội bộ:
-    // window.FITCORE_API_BASE_URL = 'http://192.168.1.170:5000/api';
   </script>
 </head>
 <body>
@@ -133,7 +129,7 @@
 <!-- ===================== MAIN APPLICATION ===================== -->
 <div id="app" style="display: none;">
   <div class="shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="side-brand">
         <div class="brand-mark" style="width:28px;height:28px;font-size:14px;">FC</div>
         <div class="brand-name" style="font-size:16px;">FitCore</div>
@@ -151,8 +147,12 @@
       </div>
     </aside>
     
+    <!-- Lớp phủ khi mở menu mobile -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
+
     <main class="main">
       <header class="mobile-topbar" id="mobileTopbar">
+        <button type="button" class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Mở menu">☰</button>
         <div class="user-chip">
           <div class="user-avatar" id="userAvatarMobile">A</div>
           <div>
@@ -193,6 +193,14 @@
 
 <script src="js/main.js"></script>
 <script>
+  function toggleMobileNav() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileNavOverlay');
+    if (!sidebar || !overlay) return;
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('show');
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     if (typeof restoreSession === 'function') {
       restoreSession();
