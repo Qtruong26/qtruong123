@@ -38,219 +38,461 @@ async function saveMyProfile() {
   } catch (err) { showApiError(err); }
 }
 
-/* ---- Đăng ký / gia hạn gói tập (tự phục vụ) ---- */
+/* =========================================================
+   ĐĂNG KÝ / GIA HẠN GÓI TẬP CHO HỘI VIÊN
+========================================================= */
+
 VIEWS.myPackages = async function () {
-  const [member, packages, history] = await Promise.all([
-    Api.get(`/members/${SESSION.memberId}`),
-    Api.get('/packages'),
-    Api.get('/packages/enrollments/list'),
-  ]);
+  try {
+    const [member, packages, history] = await Promise.all([
+      Api.get(`/members/${SESSION.memberId}`),
+      Api.get('/packages'),
+      Api.get('/packages/enrollments/list'),
+    ]);
 
-  const mp = member.activePackage;
+    const mp = member.activePackage;
 
-  // Ảnh mặc định cho từng loại gói
-  const defaultImages = [
-    'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80'
-  ];
+    // Ảnh mặc định
+    const defaultImages = [
+      'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80'
+    ];
 
-  const getPackageImage = (p, index) => {
-    return p.imageUrl || defaultImages[index % defaultImages.length];
-  };
-
-  const getPackageLevel = (name, index) => {
-    const text = String(name || '').toLowerCase();
-
-    if (text.includes('vip')) return 'VIP';
-    if (text.includes('pt')) return 'PRO';
-    if (text.includes('3')) return 'STANDARD';
-    if (text.includes('1')) return 'BASIC';
-
-    return ['BASIC', 'STANDARD', 'PRO', 'VIP'][index] || 'BASIC';
-  };
-
-  return `
-  <div class="topbar">
-    <div>
-      <div class="page-eyebrow">Tài khoản của tôi</div>
-      <div class="page-title">Đăng ký / gia hạn gói tập</div>
-      <div class="page-desc">
-        Xem gói hiện tại và đăng ký gói mới hoặc gia hạn trực tiếp.
-      </div>
-    </div>
-  </div>
-
-  <!-- GÓI HIỆN TẠI -->
-  <div class="panel current-package-panel">
-    <div class="panel-head">
-      <div class="panel-title">Gói hiện tại</div>
-    </div>
-
-    ${
-      mp
-        ? `
-        <div class="current-package-content">
-          <div>
-            <div class="current-package-name">${mp.packageName}</div>
-            <div class="hint">
-              Hiệu lực: ${mp.start_date} → ${mp.end_date}
-            </div>
-          </div>
-
-          <div>
-            ${pkgStatusBadge(
-              member.packageStatus,
-              daysBetween(todayStr(), mp.end_date)
-            )}
-          </div>
-        </div>
-        `
-        : `
-        <div class="empty-state">
-          Bạn chưa đăng ký gói tập nào.
-        </div>
-        `
-    }
-  </div>
-
-  <!-- CÁC GÓI KHẢ DỤNG -->
-  <div class="panel packages-showcase-panel">
-
-    <div class="packages-section-header">
-      <div>
-        <div class="packages-section-title">CÁC GÓI TẬP</div>
-        <div class="packages-section-subtitle">
-          ${packages.length} gói đang hoạt động
-        </div>
-      </div>
-    </div>
-
-    <div class="member-package-grid">
-
-      ${packages.map((p, index) => {
-
-        const image = getPackageImage(p, index);
-        const level = getPackageLevel(p.name, index);
-
-        return `
-        <div class="member-package-card">
-
-          <!-- ẢNH -->
-          <div class="member-package-image-wrap">
-
-            <img
-              src="${image}"
-              alt="${p.name}"
-              class="member-package-image"
-              onerror="this.src='${defaultImages[0]}'"
-            >
-
-            <div class="package-number">
-              ${String(index + 1).padStart(2, '0')}
-            </div>
-
-          </div>
-
-          <!-- NỘI DUNG -->
-          <div class="member-package-content">
-
-            <div class="member-package-name">
-              ${p.name}
-            </div>
-
-            <div class="member-package-duration">
-              ${p.durationDays} ngày
-            </div>
-
-            <div class="member-package-price">
-              ${fmtMoney(p.price)}
-            </div>
-
-            <div class="member-package-description">
-              ${p.description || 'Tập luyện tại phòng gym'}
-            </div>
-
-            <div class="member-package-divider"></div>
-
-            <div class="member-package-footer">
-
-              <span class="package-level package-level-${level.toLowerCase()}">
-                ${level}
-              </span>
-
-              <button
-                class="member-package-btn"
-                onclick="openSelfEnrollModal(${p.id})"
-              >
-                Đăng ký / Gia hạn
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-        `;
-      }).join('')}
-
-    </div>
-  </div>
-
-  <!-- LỊCH SỬ -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-title">Lịch sử gói tập</div>
-    </div>
-
-    ${
-      history.length
-        ? `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Gói</th>
-                <th>Bắt đầu</th>
-                <th>Kết thúc</th>
-                <th>Trạng thái</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${history.map((h) => `
-                <tr>
-                  <td>${h.packageName}</td>
-                  <td>${h.startDate}</td>
-                  <td>${h.endDate}</td>
-                  <td>
-                    ${pkgStatusBadge(
-                      daysBetween(todayStr(), h.endDate) < 0
-                        ? 'expired'
-                        : (
-                          daysBetween(todayStr(), h.endDate) <= 7
-                            ? 'expiring'
-                            : 'active'
-                        )
-                    )}
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-
-          </table>
-        </div>
-        `
-        : `
-        <div class="empty-state">
-          Chưa có lịch sử gói tập.
-        </div>
-        `
+    function getPackageImage(p, index) {
+      return p.imageUrl || defaultImages[index % defaultImages.length];
     }
 
-  </div>
-  `;
+    function getPackageLevel(name, index) {
+      const text = String(name || '').toLowerCase();
+
+      if (text.includes('vip')) return 'VIP';
+      if (text.includes('pt')) return 'PRO';
+      if (text.includes('3')) return 'STANDARD';
+      if (text.includes('1')) return 'BASIC';
+
+      return ['BASIC', 'STANDARD', 'PRO', 'VIP'][index] || 'BASIC';
+    }
+
+    return `
+      <div class="topbar">
+        <div>
+          <div class="page-eyebrow">Tài khoản của tôi</div>
+          <div class="page-title">Đăng ký / gia hạn gói tập</div>
+          <div class="page-desc">
+            Xem gói hiện tại và đăng ký gói mới hoặc gia hạn trực tiếp.
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================
+           GÓI HIỆN TẠI
+      ================================================== -->
+
+      <div class="panel current-package-panel">
+        <div class="panel-head">
+          <div class="panel-title">Gói hiện tại</div>
+        </div>
+
+        ${
+          mp
+            ? `
+              <div class="current-package-content">
+                <div>
+                  <div class="current-package-name">
+                    ${mp.packageName}
+                  </div>
+
+                  <div class="hint">
+                    Hiệu lực:
+                    ${mp.start_date}
+                    →
+                    ${mp.end_date}
+                  </div>
+                </div>
+
+                <div>
+                  ${pkgStatusBadge(
+                    member.packageStatus,
+                    daysBetween(todayStr(), mp.end_date)
+                  )}
+                </div>
+              </div>
+            `
+            : `
+              <div class="empty-state">
+                Bạn chưa đăng ký gói tập nào.
+              </div>
+            `
+        }
+      </div>
+
+      <!-- =================================================
+           CÁC GÓI KHẢ DỤNG
+      ================================================== -->
+
+      <div class="panel packages-showcase-panel">
+
+        <div class="packages-section-header">
+          <div>
+            <div class="packages-section-title">
+              CÁC GÓI TẬP
+            </div>
+
+            <div class="packages-section-subtitle">
+              ${packages.length} gói đang hoạt động
+            </div>
+          </div>
+        </div>
+
+        <div class="member-package-grid">
+
+          ${
+            packages.length
+              ? packages.map((p, index) => {
+
+                  const image = getPackageImage(p, index);
+                  const level = getPackageLevel(p.name, index);
+
+                  return `
+                    <div class="member-package-card">
+
+                      <!-- ẢNH -->
+                      <div class="member-package-image-wrap">
+
+                        <img
+                          src="${image}"
+                          alt="${p.name}"
+                          class="member-package-image"
+                          onerror="this.src='${defaultImages[0]}'"
+                        >
+
+                        <div class="package-number">
+                          ${String(index + 1).padStart(2, '0')}
+                        </div>
+
+                      </div>
+
+                      <!-- NỘI DUNG -->
+                      <div class="member-package-content">
+
+                        <div class="member-package-name">
+                          ${p.name}
+                        </div>
+
+                        <div class="member-package-duration">
+                          ${p.durationDays} ngày
+                        </div>
+
+                        <div class="member-package-price">
+                          ${fmtMoney(p.price)}
+                        </div>
+
+                        <div class="member-package-description">
+                          ${p.description || 'Tập luyện tại phòng gym'}
+                        </div>
+
+                        <div class="member-package-divider"></div>
+
+                        <div class="member-package-footer">
+
+                          <span class="package-level package-level-${level.toLowerCase()}">
+                            ${level}
+                          </span>
+
+                          <button
+                            type="button"
+                            class="member-package-btn"
+                            onclick="window.openSelfEnrollModal(${Number(p.id)})"
+                          >
+                            Đăng ký / Gia hạn
+                          </button>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+                  `;
+                }).join('')
+              : `
+                <div class="empty-state">
+                  Hiện chưa có gói tập nào.
+                </div>
+              `
+          }
+
+        </div>
+      </div>
+
+      <!-- =================================================
+           LỊCH SỬ GÓI
+      ================================================== -->
+
+      <div class="panel">
+
+        <div class="panel-head">
+          <div class="panel-title">
+            Lịch sử gói tập
+          </div>
+        </div>
+
+        ${
+          history.length
+            ? `
+              <div class="table-wrap">
+                <table>
+
+                  <thead>
+                    <tr>
+                      <th>Gói</th>
+                      <th>Bắt đầu</th>
+                      <th>Kết thúc</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+
+                    ${
+                      history.map((h) => {
+
+                        const days = daysBetween(
+                          todayStr(),
+                          h.endDate
+                        );
+
+                        const status =
+                          days < 0
+                            ? 'expired'
+                            : days <= 7
+                              ? 'expiring'
+                              : 'active';
+
+                        return `
+                          <tr>
+
+                            <td>
+                              ${h.packageName}
+                            </td>
+
+                            <td>
+                              ${h.startDate}
+                            </td>
+
+                            <td>
+                              ${h.endDate}
+                            </td>
+
+                            <td>
+                              ${pkgStatusBadge(status, days)}
+                            </td>
+
+                          </tr>
+                        `;
+                      }).join('')
+                    }
+
+                  </tbody>
+
+                </table>
+              </div>
+            `
+            : `
+              <div class="empty-state">
+                Chưa có lịch sử gói tập.
+              </div>
+            `
+        }
+
+      </div>
+    `;
+
+  } catch (err) {
+    showApiError(err);
+
+    return `
+      <div class="panel">
+        <div class="empty-state">
+          Không thể tải danh sách gói tập.
+        </div>
+      </div>
+    `;
+  }
+};
+
+
+/* =========================================================
+   MODAL ĐĂNG KÝ GÓI
+========================================================= */
+
+window.openSelfEnrollModal = async function (packageId) {
+
+  try {
+
+    const packages = await Api.get('/packages');
+
+    const pkg = packages.find(
+      p => Number(p.id) === Number(packageId)
+    );
+
+    if (!pkg) {
+      toast('Không tìm thấy gói tập.', true);
+      return;
+    }
+
+    openModal(`
+
+      <div class="modal-title">
+        Đăng ký / Gia hạn gói
+      </div>
+
+      <div class="hint" style="margin-bottom:18px;">
+        ${pkg.name}
+        • ${pkg.durationDays} ngày
+        • ${fmtMoney(pkg.price)}
+      </div>
+
+      <div class="field">
+
+        <label>
+          Ngày bắt đầu
+        </label>
+
+        <input
+          id="sef_start"
+          type="date"
+          value="${todayStr()}"
+        >
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Hình thức thanh toán
+        </label>
+
+        <select id="sef_method">
+
+          <option value="Chuyển khoản">
+            Chuyển khoản
+          </option>
+
+          <option value="Tiền mặt">
+            Tiền mặt
+          </option>
+
+          <option value="Thẻ">
+            Thẻ
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="hint" style="margin-top:8px;">
+        Nếu chọn chuyển khoản, hệ thống sẽ hiển thị mã QR VietQR để thanh toán.
+      </div>
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="closeModal()"
+        >
+          Hủy
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="window.selfEnroll(
+            ${Number(packageId)},
+            document.getElementById('sef_start').value,
+            document.getElementById('sef_method').value
+          )"
+        >
+          Tiếp tục
+        </button>
+
+      </div>
+
+    `);
+
+  } catch (err) {
+
+    showApiError(err);
+
+  }
+
+};
+
+
+/* =========================================================
+   XỬ LÝ ĐĂNG KÝ
+========================================================= */
+
+window.selfEnroll = async function (
+  packageId,
+  startDate,
+  method
+) {
+
+  if (!startDate) {
+    toast('Vui lòng chọn ngày bắt đầu.', true);
+    return;
+  }
+
+  if (!method) {
+    toast('Vui lòng chọn hình thức thanh toán.', true);
+    return;
+  }
+
+  try {
+
+    const data = await Api.post(
+      '/packages/enrollments',
+      {
+        packageId: Number(packageId),
+        startDate,
+        method
+      }
+    );
+
+    /* Chuyển khoản */
+    if (data.requiresPayment) {
+
+      showPaymentQrModal(
+        data,
+        {
+          memberId: SESSION.memberId,
+          packageId: Number(packageId),
+          startDate,
+          method
+        }
+      );
+
+      return;
+    }
+
+    /* Tiền mặt / thẻ */
+    toast(
+      'Đã đăng ký gói và ghi nhận thanh toán.'
+    );
+
+    closeModal();
+
+    navigate('myPackages');
+
+  } catch (err) {
+
+    showApiError(err);
+
+  }
+
 };
 
 /* ---- Check-in (tự phục vụ) ---- */

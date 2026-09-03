@@ -807,250 +807,174 @@ async function submitEnroll() {
 
 }
 
-
 /* =========================================================
-   MEMBER TỰ ĐĂNG KÝ
+   ĐĂNG KÝ / GIA HẠN GÓI - HỘI VIÊN
 ========================================================= */
 
-async function selfEnroll(
-  packageId,
-  startDate,
-  method
-) {
-
+async function selfEnroll(packageId, startDate, method) {
   try {
-
-    const data =
-      await Api.post(
-        '/packages/enrollments',
-        {
-          packageId,
-          startDate,
-          method
-        }
-      );
-
-
-    if (data.requiresPayment) {
-
-      showPaymentQrModal(
-        data,
-        {
-          memberId: SESSION.memberId,
-          packageId,
-          startDate,
-          method
-        }
-      );
-
-    } else {
-
-      toast(
-        'Đã đăng ký gói và ghi nhận thanh toán.'
-      );
-
-      closeModal();
-
-      navigate('myPackages');
-
+    if (!packageId || !startDate || !method) {
+      toast('Vui lòng nhập đầy đủ thông tin.', true);
+      return;
     }
 
+    // Đóng modal đăng ký hiện tại
+    closeModal();
+
+    // Gửi yêu cầu đăng ký lên API
+    const result = await Api.post('/packages/enrollments', {
+      packageId: Number(packageId),
+      startDate,
+      method
+    });
+
+    /* =====================================================
+       THANH TOÁN CHUYỂN KHOẢN -> HIỆN QR
+    ===================================================== */
+
+    if (result.requiresPayment) {
+      const pending = result.pendingEnrollment;
+
+      openModal(`
+        <div class="modal-title">Thanh toán gói tập</div>
+
+        <div class="hint" style="margin-bottom:16px;">
+          Vui lòng quét mã QR bên dưới để thanh toán.
+        </div>
+
+        <div style="
+          text-align:center;
+          background:#fff;
+          border-radius:14px;
+          padding:18px;
+          margin-bottom:16px;
+        ">
+          <img
+            src="${result.qrUrl}"
+            alt="QR thanh toán"
+            style="
+              width:280px;
+              max-width:100%;
+              height:auto;
+              display:block;
+              margin:0 auto;
+            "
+          >
+        </div>
+
+        <div class="panel" style="margin-bottom:14px;">
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:8px;
+          ">
+            <span class="hint">Số tiền</span>
+            <b style="
+              color:var(--volt);
+              font-size:18px;
+            ">
+              ${fmtMoney(result.amount)}
+            </b>
+          </div>
+
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+          ">
+            <span class="hint">Nội dung</span>
+            <b>${result.note}</b>
+          </div>
+        </div>
+
+        <div class="hint" style="
+          padding:12px;
+          border-radius:10px;
+          background:rgba(255,255,255,.04);
+          margin-bottom:16px;
+        ">
+          Sau khi chuyển khoản thành công, hãy bấm
+          <b>"Tôi đã thanh toán"</b> để xác nhận đăng ký.
+        </div>
+
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal()">
+            Hủy
+          </button>
+
+          <button
+            class="btn btn-primary"
+            onclick='confirmSelfPayment(${JSON.stringify(pending)})'>
+            Tôi đã thanh toán
+          </button>
+        </div>
+      `);
+
+      return;
+    }
+
+    /* =====================================================
+       THANH TOÁN TIỀN MẶT / THẺ
+    ===================================================== */
+
+    toast('Đăng ký gói thành công.');
+
+    // Load lại trang gói
+    navigate('myPackages');
+
   } catch (err) {
-
+    console.error('selfEnroll error:', err);
     showApiError(err);
-
   }
-
 }
 
 
 /* =========================================================
-   QR THANH TOÁN
+   XÁC NHẬN ĐÃ THANH TOÁN QR
 ========================================================= */
 
-function showPaymentQrModal(
-  data,
-  pending
-) {
+async function confirmSelfPayment(pendingEnrollment) {
+  try {
+    if (!pendingEnrollment) {
+      toast('Không tìm thấy thông tin đăng ký.', true);
+      return;
+    }
 
-  openModal(`
+    const result = await Api.post(
+      '/packages/enrollments/confirm-payment',
+      {
+        memberId: Number(pendingEnrollment.memberId),
+        packageId: Number(pendingEnrollment.packageId),
+        startDate: pendingEnrollment.startDate,
+        method: pendingEnrollment.method || 'Chuyển khoản'
+      }
+    );
 
-    <div class="modal-title">
-      Quét mã QR để thanh toán
-    </div>
+    closeModal();
 
+    toast(
+      result.message || 'Đã xác nhận thanh toán và đăng ký gói thành công.'
+    );
 
-    <div style="text-align:center;">
+    // Cập nhật lại giao diện
+    navigate('myPackages');
 
-      <div
-        id="qr_wrap"
-        style="
-          width:100%;
-          max-width:280px;
-          min-height:280px;
-          margin:0 auto;
-          border-radius:10px;
-          border:1px solid var(--line);
-          background:#fff;
-          padding:10px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        "
-      >
-
-        <div
-          id="qr_loading"
-          style="
-            color:#888;
-            font-size:12.5px;
-          "
-        >
-          Đang tải mã QR…
-        </div>
-
-
-        <img
-          id="qr_img"
-          src="${data.qrUrl}"
-          alt="Mã QR thanh toán VietQR"
-          style="
-            display:none;
-            width:100%;
-            border-radius:6px;
-          "
-          onload="
-            document.getElementById('qr_loading').style.display='none';
-            this.style.display='block';
-          "
-          onerror="
-            document.getElementById('qr_loading').innerHTML='⚠️ Không tải được mã QR.';
-          "
-        >
-
-      </div>
-
-
-      <a
-        href="${data.qrUrl}"
-        target="_blank"
-        rel="noopener"
-        class="hint"
-        style="
-          display:inline-block;
-          margin-top:8px;
-          color:var(--steel);
-        "
-      >
-        ↗ Mở mã QR trong tab mới
-      </a>
-
-
-      <div
-        style="
-          margin-top:14px;
-          font-size:14px;
-        "
-      >
-
-        <div>
-          <b>
-            ${data.bank.accountName}
-          </b>
-
-          —
-          
-          ${data.bank.accountNumber}
-        </div>
-
-
-        <div
-          class="hint"
-          style="margin-top:2px;"
-        >
-          Ngân hàng
-          (mã BIN: ${data.bank.bin})
-        </div>
-
-      </div>
-
-
-      <div
-        style="
-          margin-top:12px;
-          padding:12px;
-          background:var(--surface-2);
-          border-radius:8px;
-        "
-      >
-
-        <div
-          class="stat-label"
-          style="margin-bottom:4px;"
-        >
-          Số tiền cần thanh toán
-        </div>
-
-
-        <div
-          class="stat-value mono"
-          style="font-size:22px;"
-        >
-          ${fmtMoney(data.amount)}
-        </div>
-
-      </div>
-
-
-      <div
-        class="hint"
-        style="margin-top:10px;"
-      >
-        Nội dung chuyển khoản:
-        ${data.note}
-      </div>
-
-    </div>
-
-
-    <div
-      class="ai-disclaimer"
-      style="margin-top:16px;"
-    >
-      ⚠️ Vui lòng kiểm tra hệ thống ngân hàng đã nhận được tiền trước khi xác nhận.
-    </div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-secondary"
-        onclick="closeModal()"
-      >
-        Hủy
-      </button>
-
-
-      <button
-        class="btn btn-primary"
-        onclick="
-          confirmPaymentDone(
-            ${pending.memberId},
-            ${pending.packageId},
-            '${pending.startDate}',
-            '${pending.method}'
-          )
-        "
-      >
-        ✔ Xác nhận đã thanh toán
-      </button>
-
-    </div>
-
-  `);
+  } catch (err) {
+    console.error('confirmSelfPayment error:', err);
+    showApiError(err);
+  }
 }
 
 
+/* =========================================================
+   ĐẢM BẢO ONCLICK HTML GỌI ĐƯỢC HÀM
+========================================================= */
+
+window.selfEnroll = selfEnroll;
+window.confirmSelfPayment = confirmSelfPayment;
+window.openSelfEnrollModal = openSelfEnrollModal;
 /* =========================================================
    XÁC NHẬN THANH TOÁN
 ========================================================= */
