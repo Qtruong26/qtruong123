@@ -1,119 +1,166 @@
 VIEWS.packages = async function () {
 
-  const [
-    packages,
-    enrollments,
-    payments
-  ] = await Promise.all([
+  const [packages, enrollments, payments] = await Promise.all([
     Api.get('/packages'),
     Api.get('/packages/enrollments/list'),
     Api.get('/packages/payments/list')
   ]);
 
+  window.__packagesCache = packages;
+
 
   /* =====================================================
-     DANH SÁCH GÓI
+     ẢNH MẶC ĐỊNH CHO GÓI
   ===================================================== */
 
-  const pkgRows = packages.map((p) => `
+  function getPackageImage(pkg) {
 
-    <div class="package-card">
+    if (pkg.imageUrl && pkg.imageUrl.trim()) {
+      return pkg.imageUrl;
+    }
 
-      <div class="package-image">
+    const name = pkg.name.toLowerCase();
 
-        <img
-          src="${p.imageUrl || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop'}"
-          alt="${p.name}"
-          loading="lazy"
-          onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop'"
-        >
+    if (name.includes('1 tháng')) {
+      return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop';
+    }
 
-      </div>
+    if (name.includes('3 tháng')) {
+      return 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=900&auto=format&fit=crop';
+    }
+
+    if (name.includes('6 tháng')) {
+      return 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=900&auto=format&fit=crop';
+    }
+
+    if (name.includes('12 tháng')) {
+      return 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?q=80&w=900&auto=format&fit=crop';
+    }
+
+    return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop';
+  }
 
 
-      <div class="package-content">
+  /* =====================================================
+     CARD GÓI TẬP
+  ===================================================== */
 
-        <div class="package-name">
-          ${p.name}
+  const packageCards = packages.map((p, index) => {
+
+    const image = getPackageImage(p);
+
+    return `
+      <div class="package-card">
+
+        <div class="package-image-wrap">
+
+          <img
+            src="${image}"
+            alt="${p.name}"
+            class="package-image"
+            loading="lazy"
+            onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop'"
+          >
+
+          <div class="package-number">
+            ${String(index + 1).padStart(2, '0')}
+          </div>
+
         </div>
 
-        <div class="package-duration">
-          ${p.durationDays} ngày
-        </div>
 
-        <div class="package-price">
-          ${fmtMoney(p.price)}
-        </div>
+        <div class="package-content">
 
-        <div class="package-description">
-          ${p.description || 'Chưa có mô tả cho gói tập này.'}
-        </div>
+          <div class="package-top">
 
-
-        ${
-          SESSION.role === 'admin'
-            ? `
-              <div class="package-actions">
-
-                <button
-                  class="icon-btn danger"
-                  onclick="deletePackage(${p.id})"
-                >
-                  Xóa
-                </button>
-
+            <div>
+              <div class="package-name">
+                ${p.name}
               </div>
-            `
-            : ''
-        }
+
+              <div class="package-duration">
+                ${p.durationDays} ngày
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class="package-price">
+            ${fmtMoney(p.price)}
+          </div>
+
+
+          <div class="package-description">
+            ${p.description || 'Gói tập tiêu chuẩn tại FitCore'}
+          </div>
+
+
+          <div class="package-footer">
+
+            <span class="package-tag">
+              ${p.durationDays >= 365 ? 'VIP' :
+                p.durationDays >= 180 ? 'PRO' :
+                p.durationDays >= 90 ? 'STANDARD' :
+                'BASIC'}
+            </span>
+
+
+            ${
+              SESSION.role === 'admin'
+                ? `
+                  <button
+                    class="icon-btn danger"
+                    onclick="deletePackage(${p.id})"
+                  >
+                    Xóa
+                  </button>
+                `
+                : ''
+            }
+
+          </div>
+
+        </div>
 
       </div>
+    `;
 
-    </div>
-
-  `).join('');
+  }).join('');
 
 
   /* =====================================================
      LỊCH SỬ ĐĂNG KÝ
   ===================================================== */
 
-  const enrollRows = enrollments.map((e) => {
+  const enrollRows = enrollments.map((e) => `
 
-    const days =
-      daysBetween(
-        todayStr(),
-        e.endDate
-      );
+    <tr>
 
-    const status =
-      days < 0
-        ? 'expired'
-        : days <= 7
-          ? 'expiring'
-          : 'active';
+      <td>${e.memberName}</td>
 
-    return `
+      <td>${e.packageName}</td>
 
-      <tr>
+      <td>${e.startDate}</td>
 
-        <td>${e.memberName}</td>
+      <td>${e.endDate}</td>
 
-        <td>${e.packageName}</td>
+      <td>
+        ${pkgStatusBadge(
+          daysBetween(todayStr(), e.endDate) < 0
+            ? 'expired'
+            : (
+              daysBetween(todayStr(), e.endDate) <= 7
+                ? 'expiring'
+                : 'active'
+            ),
+          daysBetween(todayStr(), e.endDate)
+        )}
+      </td>
 
-        <td>${e.startDate}</td>
+    </tr>
 
-        <td>${e.endDate}</td>
-
-        <td>
-          ${pkgStatusBadge(status, days)}
-        </td>
-
-      </tr>
-
-    `;
-
-  }).join('');
+  `).join('');
 
 
   /* =====================================================
@@ -130,9 +177,7 @@ VIEWS.packages = async function () {
 
       <td>${p.packageName}</td>
 
-      <td>
-        ${fmtMoney(p.amount)}
-      </td>
+      <td>${fmtMoney(p.amount)}</td>
 
       <td>${p.method}</td>
 
@@ -141,213 +186,203 @@ VIEWS.packages = async function () {
   `).join('');
 
 
-  window.__packagesCache = packages;
-
-
   /* =====================================================
      GIAO DIỆN
   ===================================================== */
 
   return `
 
-    <div class="topbar">
+  <div class="topbar">
+
+    <div>
+
+      <div class="page-eyebrow">
+        VẬN HÀNH
+      </div>
+
+      <div class="page-title">
+        Gói tập & Thanh toán
+      </div>
+
+      <div class="page-desc">
+        Quản lý các gói tập và đăng ký thành viên.
+      </div>
+
+    </div>
+
+
+    ${
+      SESSION.role === 'admin'
+        ? `
+          <button
+            class="btn btn-secondary"
+            onclick="openPackageModal()"
+          >
+            + Gói mới
+          </button>
+        `
+        : ''
+    }
+
+  </div>
+
+
+  <!-- =========================
+       DANH SÁCH GÓI
+  ========================== -->
+
+  <div class="panel packages-panel">
+
+    <div class="panel-head">
 
       <div>
 
-        <div class="page-eyebrow">
-          Vận hành
-        </div>
-
-        <div class="page-title">
-          Gói tập &amp; Thanh toán
-        </div>
-
-        <div class="page-desc">
-          Quản lý các gói tập, đăng ký/gia hạn
-          cho hội viên và lịch sử thanh toán.
-        </div>
-
-      </div>
-
-
-      ${
-        SESSION.role === 'admin'
-          ? `
-            <button
-              class="btn btn-secondary"
-              onclick="openPackageModal()"
-            >
-              + Gói mới
-            </button>
-          `
-          : ''
-      }
-
-    </div>
-
-
-    <!-- ============================
-         DANH SÁCH GÓI
-    ============================= -->
-
-    <div class="panel">
-
-      <div class="panel-head">
-
         <div class="panel-title">
-          Danh sách gói tập
+          CÁC GÓI TẬP
         </div>
 
         <div class="hint">
-          ${packages.length} gói
+          ${packages.length} gói đang hoạt động
         </div>
-
-      </div>
-
-
-      <div class="package-grid">
-
-        ${
-          pkgRows ||
-          `
-            <div class="empty-state">
-              Chưa có gói tập nào.
-            </div>
-          `
-        }
 
       </div>
 
     </div>
 
 
-    <!-- ============================
-         ĐĂNG KÝ GÓI
-    ============================= -->
+    <div class="packages-grid">
 
-    <div class="panel">
-
-      <div class="panel-head">
-
-        <div class="panel-title">
-          Đăng ký / Gia hạn gói cho hội viên
+      ${packageCards || `
+        <div class="empty-state">
+          Chưa có gói tập nào.
         </div>
+      `}
 
-        <button
-          class="btn btn-primary"
-          onclick="openEnrollModal()"
-        >
-          + Đăng ký gói
-        </button>
+    </div>
 
+  </div>
+
+
+  <!-- =========================
+       ĐĂNG KÝ
+  ========================== -->
+
+  <div class="panel">
+
+    <div class="panel-head">
+
+      <div class="panel-title">
+        Đăng ký / Gia hạn gói
       </div>
 
+      <button
+        class="btn btn-primary"
+        onclick="openEnrollModal()"
+      >
+        + Đăng ký gói
+      </button>
 
-      <div class="table-wrap">
+    </div>
 
-        <table>
 
-          <thead>
+    <div class="table-wrap">
 
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Hội viên</th>
+            <th>Gói</th>
+            <th>Bắt đầu</th>
+            <th>Kết thúc</th>
+            <th>Trạng thái</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            enrollRows ||
+            `
             <tr>
-              <th>Hội viên</th>
-              <th>Gói</th>
-              <th>Bắt đầu</th>
-              <th>Kết thúc</th>
-              <th>Trạng thái</th>
+              <td colspan="5">
+                <div class="empty-state">
+                  Chưa có đăng ký nào.
+                </div>
+              </td>
             </tr>
+            `
+          }
 
-          </thead>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
 
 
-          <tbody>
+  <!-- =========================
+       THANH TOÁN
+  ========================== -->
 
-            ${
-              enrollRows ||
-              `
-                <tr>
+  <div class="panel">
 
-                  <td colspan="5">
+    <div class="panel-head">
 
-                    <div class="empty-state">
-                      Chưa có đăng ký nào.
-                    </div>
-
-                  </td>
-
-                </tr>
-              `
-            }
-
-          </tbody>
-
-        </table>
-
+      <div class="panel-title">
+        Lịch sử thanh toán
       </div>
 
     </div>
 
 
-    <!-- ============================
-         THANH TOÁN
-    ============================= -->
+    <div class="table-wrap">
 
-    <div class="panel">
+      <table>
 
-      <div class="panel-head">
+        <thead>
 
-        <div class="panel-title">
-          Lịch sử thanh toán
-        </div>
+          <tr>
+            <th>Ngày</th>
+            <th>Hội viên</th>
+            <th>Gói</th>
+            <th>Số tiền</th>
+            <th>Hình thức</th>
+          </tr>
 
-      </div>
+        </thead>
 
 
-      <div class="table-wrap">
+        <tbody>
 
-        <table>
-
-          <thead>
-
+          ${
+            payRows ||
+            `
             <tr>
-              <th>Ngày</th>
-              <th>Hội viên</th>
-              <th>Gói</th>
-              <th>Số tiền</th>
-              <th>Hình thức</th>
+              <td colspan="5">
+                <div class="empty-state">
+                  Chưa có giao dịch nào.
+                </div>
+              </td>
             </tr>
+            `
+          }
 
-          </thead>
+        </tbody>
 
-
-          <tbody>
-
-            ${
-              payRows ||
-              `
-                <tr>
-
-                  <td colspan="5">
-
-                    <div class="empty-state">
-                      Chưa có giao dịch nào.
-                    </div>
-
-                  </td>
-
-                </tr>
-              `
-            }
-
-          </tbody>
-
-        </table>
-
-      </div>
+      </table>
 
     </div>
+
+  </div>
 
   `;
+
 };
 
 
@@ -372,7 +407,7 @@ function openPackageModal() {
 
       <input
         id="pf_name"
-        placeholder="VD: Gói 3 tháng"
+        placeholder="Ví dụ: Gym Basic"
       >
 
     </div>
@@ -404,9 +439,28 @@ function openPackageModal() {
         <input
           id="pf_price"
           type="number"
-          value="500000"
+          value="600000"
         >
 
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Link hình ảnh
+      </label>
+
+      <input
+        id="pf_image"
+        type="url"
+        placeholder="https://..."
+      >
+
+      <div class="hint">
+        Có thể để trống, hệ thống sẽ tự chọn ảnh.
       </div>
 
     </div>
@@ -421,27 +475,8 @@ function openPackageModal() {
       <textarea
         id="pf_desc"
         rows="3"
-        placeholder="Mô tả quyền lợi của gói..."
+        placeholder="Mô tả gói tập..."
       ></textarea>
-
-    </div>
-
-
-    <div class="field">
-
-      <label>
-        URL hình ảnh minh họa
-      </label>
-
-      <input
-        id="pf_image"
-        type="url"
-        placeholder="https://images.unsplash.com/..."
-      >
-
-      <div class="hint" style="margin-top:6px;">
-        Dán đường dẫn hình ảnh trên Internet.
-      </div>
 
     </div>
 
@@ -476,8 +511,27 @@ function openPackageModal() {
 async function savePackage() {
 
   const name =
-    document
-      .getElementById('pf_name')
+    document.getElementById('pf_name')
+      .value
+      .trim();
+
+  const durationDays =
+    Number(
+      document.getElementById('pf_days').value
+    );
+
+  const price =
+    Number(
+      document.getElementById('pf_price').value
+    );
+
+  const description =
+    document.getElementById('pf_desc')
+      .value
+      .trim();
+
+  const imageUrl =
+    document.getElementById('pf_image')
       .value
       .trim();
 
@@ -493,51 +547,23 @@ async function savePackage() {
   }
 
 
-  const data = {
-
-    name,
-
-    durationDays:
-      Number(
-        document
-          .getElementById('pf_days')
-          .value
-      ),
-
-    price:
-      Number(
-        document
-          .getElementById('pf_price')
-          .value
-      ),
-
-    description:
-      document
-        .getElementById('pf_desc')
-        .value
-        .trim(),
-
-    imageUrl:
-      document
-        .getElementById('pf_image')
-        .value
-        .trim()
-
-  };
-
-
   try {
 
     await Api.post(
       '/packages',
-      data
+      {
+        name,
+        durationDays,
+        price,
+        description,
+        imageUrl
+      }
     );
 
 
     toast(
       'Đã thêm gói tập.'
     );
-
 
     closeModal();
 
@@ -587,14 +613,13 @@ function deletePackage(id) {
 
 
 /* =========================================================
-   MODAL ĐĂNG KÝ GÓI
+   ĐĂNG KÝ GÓI
 ========================================================= */
 
 async function openEnrollModal() {
 
   const members =
     await Api.get('/members');
-
 
   const packages =
     window.__packagesCache ||
@@ -617,11 +642,9 @@ async function openEnrollModal() {
       <select id="ef_member">
 
         ${members.map(m => `
-
           <option value="${m.id}">
             ${m.name}
           </option>
-
         `).join('')}
 
       </select>
@@ -638,11 +661,9 @@ async function openEnrollModal() {
       <select id="ef_package">
 
         ${packages.map(p => `
-
           <option value="${p.id}">
             ${p.name} — ${fmtMoney(p.price)}
           </option>
-
         `).join('')}
 
       </select>
@@ -718,37 +739,26 @@ async function openEnrollModal() {
 
 
 /* =========================================================
-   XỬ LÝ ĐĂNG KÝ
+   SUBMIT ĐĂNG KÝ
 ========================================================= */
 
 async function submitEnroll() {
 
   const memberId =
     Number(
-      document
-        .getElementById('ef_member')
-        .value
+      document.getElementById('ef_member').value
     );
-
 
   const packageId =
     Number(
-      document
-        .getElementById('ef_package')
-        .value
+      document.getElementById('ef_package').value
     );
 
-
   const startDate =
-    document
-      .getElementById('ef_start')
-      .value;
-
+    document.getElementById('ef_start').value;
 
   const method =
-    document
-      .getElementById('ef_method')
-      .value;
+    document.getElementById('ef_method').value;
 
 
   try {
@@ -914,7 +924,7 @@ function showPaymentQrModal(
             this.style.display='block';
           "
           onerror="
-            document.getElementById('qr_loading').innerHTML='⚠️ Không tải được hình ảnh mã QR.<br>Vui lòng dùng nút bên dưới hoặc chuyển khoản thủ công.';
+            document.getElementById('qr_loading').innerHTML='⚠️ Không tải được mã QR.';
           "
         >
 
@@ -944,16 +954,22 @@ function showPaymentQrModal(
       >
 
         <div>
-          <b>${data.bank.accountName}</b>
+          <b>
+            ${data.bank.accountName}
+          </b>
+
           —
+          
           ${data.bank.accountNumber}
         </div>
+
 
         <div
           class="hint"
           style="margin-top:2px;"
         >
-          Ngân hàng (mã BIN: ${data.bank.bin})
+          Ngân hàng
+          (mã BIN: ${data.bank.bin})
         </div>
 
       </div>
@@ -1001,8 +1017,7 @@ function showPaymentQrModal(
       class="ai-disclaimer"
       style="margin-top:16px;"
     >
-      ⚠️ Vui lòng kiểm tra hệ thống ngân hàng
-      đã nhận được tiền trước khi bấm xác nhận.
+      ⚠️ Vui lòng kiểm tra hệ thống ngân hàng đã nhận được tiền trước khi xác nhận.
     </div>
 
 
@@ -1064,9 +1079,7 @@ async function confirmPaymentDone(
       'Đã xác nhận thanh toán và đăng ký gói.'
     );
 
-
     closeModal();
-
 
     navigate(
       SESSION.role === 'member'

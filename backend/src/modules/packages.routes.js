@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.use(requireAuth);
 
+
 /* =========================================================
    GÓI TẬP
 ========================================================= */
@@ -35,6 +36,7 @@ router.get('/', async (req, res, next) => {
     `);
 
     res.json(rows);
+
   } catch (err) {
     next(err);
   }
@@ -47,6 +49,7 @@ router.get('/', async (req, res, next) => {
  */
 router.post('/', requireRole('admin'), async (req, res, next) => {
   try {
+
     const {
       name,
       durationDays,
@@ -98,10 +101,10 @@ router.post('/', requireRole('admin'), async (req, res, next) => {
 
 /**
  * DELETE /api/packages/:id
- * Chỉ admin được xóa
  */
 router.delete('/:id', requireRole('admin'), async (req, res, next) => {
   try {
+
     await pool.query(
       'DELETE FROM packages WHERE id = ?',
       [req.params.id]
@@ -126,6 +129,7 @@ router.delete('/:id', requireRole('admin'), async (req, res, next) => {
  */
 router.get('/enrollments/list', async (req, res, next) => {
   try {
+
     let sql = `
       SELECT
         mp.id,
@@ -145,10 +149,15 @@ router.get('/enrollments/list', async (req, res, next) => {
     const params = [];
 
     if (req.user.role === 'member') {
+
       sql += ' WHERE mp.member_id = ?';
+
       params.push(req.user.memberId);
+
     } else if (req.query.memberId) {
+
       sql += ' WHERE mp.member_id = ?';
+
       params.push(req.query.memberId);
     }
 
@@ -169,6 +178,7 @@ router.get('/enrollments/list', async (req, res, next) => {
  */
 router.post('/enrollments', async (req, res, next) => {
   try {
+
     const {
       packageId,
       startDate,
