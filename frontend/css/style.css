@@ -1227,3 +1227,360 @@ table,
   }
 
 }
+/* =========================================================
+   MEMBER PACKAGES - CARD STYLE
+   ========================================================= */
+
+.packages-showcase-panel {
+  padding: 24px;
+  overflow: hidden;
+}
+
+.packages-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.packages-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.packages-section-subtitle {
+  margin-top: 5px;
+  color: var(--muted, #8d95a7);
+  font-size: 14px;
+}
+
+
+/* GRID 4 CARD */
+
+.member-package-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+
+/* CARD */
+
+.member-package-card {
+  min-width: 0;
+  overflow: hidden;
+
+  background: #202530;
+  border: 1px solid #343b49;
+  border-radius: 16px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.member-package-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(164, 255, 32, 0.55);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ẢNH */
+
+.member-package-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #151922;
+}
+
+.member-package-image {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition: transform 0.35s ease;
+}
+
+.member-package-card:hover .member-package-image {
+  transform: scale(1.04);
+}
+
+
+/* SỐ 01 - 02 - 03 - 04 */
+
+.package-number {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  min-width: 34px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+
+  border-radius: 7px;
+
+  background: #202530;
+  color: #aaff00;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+
+/* CONTENT */
+
+.member-package-content {
+  padding: 18px;
+}
+
+
+/* TÊN */
+
+.member-package-name {
+  color: #f3f5f8;
+
+  font-size: 20px;
+  font-weight: 800;
+
+  line-height: 1.2;
+
+  margin-bottom: 7px;
+}
+
+
+/* SỐ NGÀY */
+
+.member-package-duration {
+  color: #b0b6c2;
+
+  font-size: 14px;
+
+  margin-bottom: 12px;
+}
+
+
+/* GIÁ */
+
+.member-package-price {
+  color: #aaff00;
+
+  font-size: 24px;
+  font-weight: 900;
+
+  letter-spacing: 0.2px;
+
+  margin-bottom: 10px;
+}
+
+
+/* MÔ TẢ */
+
+.member-package-description {
+  min-height: 42px;
+
+  color: #c1c6d0;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ĐƯỜNG KẺ */
+
+.member-package-divider {
+  height: 1px;
+
+  background: #343b49;
+
+  margin: 18px 0 14px;
+}
+
+
+/* FOOTER */
+
+.member-package-footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+
+/* BADGE */
+
+.package-level {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  height: 26px;
+
+  padding: 0 9px;
+
+  border-radius: 6px;
+
+  border: 1px solid rgba(170, 255, 0, 0.25);
+
+  background: rgba(170, 255, 0, 0.07);
+
+  color: #aaff00;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* NÚT */
+
+.member-package-btn {
+  flex: 1;
+
+  min-height: 40px;
+
+  border: none;
+  border-radius: 9px;
+
+  padding: 0 12px;
+
+  background: linear-gradient(
+    90deg,
+    #9bf01b,
+    #4fe078
+  );
+
+  color: #10140f;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.member-package-btn:hover {
+  filter: brightness(1.08);
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 18px rgba(130, 255, 40, 0.22);
+}
+
+.member-package-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   GÓI HIỆN TẠI
+   ========================================================= */
+
+.current-package-content {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 4px 0;
+}
+
+.current-package-name {
+  font-size: 18px;
+  font-weight: 800;
+
+  margin-bottom: 5px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+/* Laptop nhỏ */
+
+@media (max-width: 1200px) {
+
+  .member-package-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* Tablet */
+
+@media (max-width: 760px) {
+
+  .packages-showcase-panel {
+    padding: 18px;
+  }
+
+  .member-package-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .member-package-image-wrap {
+    height: 200px;
+  }
+
+}
+
+
+/* Điện thoại */
+
+@media (max-width: 480px) {
+
+  .member-package-content {
+    padding: 15px;
+  }
+
+  .member-package-image-wrap {
+    height: 170px;
+  }
+
+  .member-package-name {
+    font-size: 18px;
+  }
+
+  .member-package-price {
+    font-size: 21px;
+  }
+
+  .member-package-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .package-level {
+    width: fit-content;
+  }
+
+}
