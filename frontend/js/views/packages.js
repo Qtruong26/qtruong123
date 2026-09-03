@@ -774,36 +774,29 @@ async function submitEnroll() {
         }
       );
 
+if (data.requiresPayment) {
 
-    if (data.requiresPayment) {
-
-      showPaymentQrModal(
-        data,
-        {
-          memberId,
-          packageId,
-          startDate,
-          method
-        }
-      );
-
-    } else {
-
-      toast(
-        'Đã đăng ký gói và ghi nhận thanh toán.'
-      );
-
-      closeModal();
-
-      navigate('packages');
-
+  showPaymentQrModal(
+    data,
+    {
+      memberId: Number(memberId),
+      packageId: Number(packageId),
+      startDate: startDate,
+      method: method
     }
+  );
 
-  } catch (err) {
+  return;
 
-    showApiError(err);
+} else {
 
-  }
+  toast(
+    data.message || 'Đã đăng ký gói và ghi nhận thanh toán.'
+  );
+
+  closeModal();
+
+  navigate('myPackages');
 
 }
 
