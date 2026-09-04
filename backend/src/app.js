@@ -29,6 +29,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'fitcore-
 app.use('/api/auth', authRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/members', membersRoutes);
+app.use('/api/ai-logs', require('./modules/ai_logs.routes'));
 app.use('/api/trainers', trainersRoutes);
 app.use('/api/packages', packagesRoutes);
 app.use('/api/schedules', schedulesRoutes);
