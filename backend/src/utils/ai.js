@@ -10,15 +10,19 @@
  */
 
 const { GoogleGenAI } = require('@google/genai');
+
 const { stripDiacritics } = require('./vietqr');
 const { todayStr, daysBetween } = require('./dateUtils');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
+const aiClient = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY
+});
+const response = await aiClient.models.generateContent({
+  model: process.env.GEMINI_MODEL || 'gemini-3.7-flash',
+  contents: 'Xin chào, hãy giới thiệu trợ lý AI FitCore.'
+});
 
-if (!GEMINI_API_KEY) {
-  console.warn('⚠️ GEMINI_API_KEY chưa được cấu hình.');
-}
+console.log(response.text);
 
 const gemini = GEMINI_API_KEY
   ? new GoogleGenAI({
