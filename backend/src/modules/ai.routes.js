@@ -14,7 +14,11 @@ async function logAI(kind, input, output) {
 router.post('/suggest-plan', async (req, res, next) => {
   try {
     const { goal, level, availability } = req.body;
-    const plan = ai.suggestPlan(goal, availability, level);
+    const message = await ai.suggestReminderMessage(
+  member,
+  mp,
+  mp ? mp.packageName : null
+);
     await logAI('suggest_plan', { goal, level, availability }, plan);
     res.json({ plan });
   } catch (err) { next(err); }
@@ -94,13 +98,13 @@ router.post('/chat', requireRole('member'), async (req, res, next) => {
     }
 
     const answer = await ai.answerMemberQuestion(question, {
-      member,
-      activePackage,
-      packageName: activePackage ? activePackage.packageName : null,
-      nextSchedule: scheduleRows[0] || null,
-      trainerName,
-      hasTrainer: !!member.trainer_id,
-    });
+  member,
+  activePackage,
+  packageName: activePackage ? activePackage.packageName : null,
+  nextSchedule: scheduleRows[0] || null,
+  trainerName,
+  hasTrainer: !!member.trainer_id,
+});
 
     await pool.query('INSERT INTO ai_chat_logs (member_id, sender, text) VALUES (?,"user",?)', [req.user.memberId, question]);
     await pool.query('INSERT INTO ai_chat_logs (member_id, sender, text) VALUES (?,"bot",?)', [req.user.memberId, answer]);

@@ -1,4 +1,6 @@
+const { GoogleGenAI } = require('@google/genai');
 /**
+ * 
  * FitCore AI - Gemini thật
  *
  * Sử dụng Google Gemini API.
@@ -9,27 +11,14 @@
  *   gemini-2.5-pro
  */
 
-const { GoogleGenAI } = require('@google/genai');
-
-const { stripDiacritics } = require('./vietqr');
-const { todayStr, daysBetween } = require('./dateUtils');
-
-const aiClient = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY
-});
-const response = await aiClient.models.generateContent({
-  model: process.env.GEMINI_MODEL || 'gemini-3.7-flash',
-  contents: 'Xin chào, hãy giới thiệu trợ lý AI FitCore.'
-});
-
-console.log(response.text);
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
 
 const gemini = GEMINI_API_KEY
   ? new GoogleGenAI({
       apiKey: GEMINI_API_KEY
     })
   : null;
-
 
 /* =========================================================
    HÀM GỌI GEMINI
