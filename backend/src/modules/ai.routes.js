@@ -93,7 +93,7 @@ router.post('/chat', requireRole('member'), async (req, res, next) => {
       trainerName = t ? t.name : null;
     }
 
-    const answer = ai.answerMemberQuestion(question, {
+    const answer = await ai.answerMemberQuestion(question, {
       member,
       activePackage,
       packageName: activePackage ? activePackage.packageName : null,

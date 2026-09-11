@@ -16,6 +16,7 @@ const exercisesRoutes = require('./modules/exercises.routes');
 const lessonPlansRoutes = require('./modules/lessonPlans.routes');
 const progressRoutes = require('./modules/progress.routes');
 const messagesRoutes = require('./modules/messages.routes');
+const aiChatRoutes = require('./modules/ai_chat.routes');
 const aiRoutes = require('./modules/ai.routes');
 const reportsRoutes = require('./modules/reports.routes');
 
@@ -39,6 +40,7 @@ app.use('/api/lesson-plans', lessonPlansRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/ai-chat', aiChatRoutes);
 app.use('/api/reports', reportsRoutes);
 
 // Phục vụ frontend
