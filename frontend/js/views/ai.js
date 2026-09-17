@@ -118,26 +118,168 @@ async function runProgress(fixedId) {
 /* ---- Hỏi đáp chatbot cho hội viên ---- */
 VIEWS.aiChatBot = async function () {
   const SUGGESTIONS = [
-    'Gói tập của tôi còn bao nhiêu ngày?', 'Lịch tập tiếp theo của tôi là khi nào?',
-    'Làm sao để gia hạn gói tập?', 'Huấn luyện viên của tôi là ai?', 'Làm sao để check-in?',
+    'Gói tập của tôi còn bao nhiêu ngày?',
+    'Lịch tập tiếp theo của tôi là khi nào?',
+    'Làm sao để gia hạn gói tập?',
+    'Huấn luyện viên của tôi là ai?',
+    'Làm sao để check-in?'
   ];
+
   return `
   <div class="topbar">
-    <div><div class="page-eyebrow">AI trợ lý</div><div class="page-title">Hỏi đáp AI</div>
-    <div class="page-desc">Trợ lý AI trả lời nhanh các câu hỏi thường gặp về gói tập, lịch tập, huấn luyện viên và thanh toán.</div></div>
+    <div>
+      <div class="page-eyebrow">AI trợ lý</div>
+      <div class="page-title">Hỏi đáp AI</div>
+      <div class="page-desc">
+        Trợ lý AI trả lời nhanh các câu hỏi về gói tập,
+        lịch tập, huấn luyện viên và thanh toán.
+      </div>
+    </div>
   </div>
+
   <div class="panel ai-box">
+
     <div id="aichat_output"></div>
-    <div class="tag-row" style="margin-top:10px;margin-bottom:12px;">
-      ${SUGGESTIONS.map(s => `<span class="chip" onclick="sendAiChatQuick('${s.replace(/'/g, "\\'")}')">${s}</span>`).join('')}
+
+    <!-- CÂU HỎI DEMO -->
+    <div id="ai_demo_questions">
+      <div style="
+        font-size:14px;
+        font-weight:600;
+        margin-top:10px;
+        margin-bottom:8px;
+      ">
+        💡 Câu hỏi gợi ý
+      </div>
+
+      <div class="tag-row" style="margin-bottom:15px;">
+        ${SUGGESTIONS.map(s => `
+          <span
+            class="chip"
+            onclick="sendAiChatQuick('${s.replace(/'/g, "\\'")}')">
+            ${s}
+          </span>
+        `).join('')}
+      </div>
     </div>
-    <div style="display:flex;gap:8px;">
-      <input id="aichat_input" placeholder="Nhập câu hỏi của bạn..." onkeydown="if(event.key==='Enter') sendAiChatMessage()">
-      <button class="btn btn-primary" onclick="sendAiChatMessage()">Gửi</button>
+
+    <!-- CHECKBOX HỎI CÂU KHÁC -->
+    <div style="
+      margin-top:10px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:10px;
+    ">
+      <label style="
+        display:flex;
+        align-items:center;
+        gap:9px;
+        cursor:pointer;
+        font-weight:600;
+      ">
+        <input
+          type="checkbox"
+          id="ai_custom_mode"
+          onchange="toggleAiCustomQuestion()"
+          style="
+            width:18px;
+            height:18px;
+            cursor:pointer;
+          "
+        >
+        <span>❓ Hỏi câu hỏi khác</span>
+      </label>
+
+      <div
+        id="ai_custom_hint"
+        style="
+          display:none;
+          margin-top:7px;
+          font-size:13px;
+          opacity:.75;
+        "
+      >
+        Bạn có thể nhập câu hỏi khác liên quan đến việc tập luyện
+        hoặc sử dụng hệ thống FitCore.
+      </div>
     </div>
-    <div class="ai-disclaimer" style="margin-top:14px;">⚠️ Trợ lý AI này trả lời tự động, chỉ mang tính tham khảo. Với vấn đề khẩn cấp hoặc chuyên môn, vui lòng liên hệ lễ tân hoặc huấn luyện viên trực tiếp.</div>
+
+    <!-- Ô NHẬP CÂU HỎI -->
+    <div
+      id="ai_custom_input"
+      style="
+        display:none;
+        margin-top:12px;
+      "
+    >
+      <div style="
+        display:flex;
+        gap:8px;
+      ">
+        <input
+          id="aichat_input"
+          placeholder="Nhập câu hỏi của bạn..."
+          onkeydown="if(event.key==='Enter') sendAiChatMessage()"
+        >
+
+        <button
+          class="btn btn-primary"
+          onclick="sendAiChatMessage()"
+        >
+          Gửi
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="ai-disclaimer"
+      style="margin-top:14px;"
+    >
+      ⚠️ Trợ lý AI này trả lời tự động, chỉ mang tính tham khảo.
+      Với vấn đề khẩn cấp hoặc chuyên môn, vui lòng liên hệ
+      lễ tân hoặc huấn luyện viên trực tiếp.
+    </div>
+
   </div>`;
 };
+function toggleAiCustomQuestion() {
+  const checkbox = document.getElementById('ai_custom_mode');
+  const inputBox = document.getElementById('ai_custom_input');
+  const hint = document.getElementById('ai_custom_hint');
+  const demoQuestions = document.getElementById('ai_demo_questions');
+
+  if (!checkbox) return;
+
+  if (checkbox.checked) {
+    // Hiện ô nhập câu hỏi
+    inputBox.style.display = 'block';
+    hint.style.display = 'block';
+
+    // Ẩn các câu hỏi demo
+    if (demoQuestions) {
+      demoQuestions.style.display = 'none';
+    }
+
+    // Tự động đưa con trỏ vào ô nhập
+    setTimeout(() => {
+      const input = document.getElementById('aichat_input');
+
+      if (input) {
+        input.focus();
+      }
+    }, 100);
+
+  } else {
+    // Ẩn ô nhập
+    inputBox.style.display = 'none';
+    hint.style.display = 'none';
+
+    // Hiện lại câu hỏi demo
+    if (demoQuestions) {
+      demoQuestions.style.display = 'block';
+    }
+  }
+}
 async function renderAiChat() {
   const el = document.getElementById('aichat_output');
   if (!el) return;
