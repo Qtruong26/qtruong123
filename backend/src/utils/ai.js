@@ -13,7 +13,6 @@
 
 const { todayStr, daysBetween } = require('./dateUtils');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL =
   process.env.GEMINI_MODEL || 'gemini-3.7-flash';
 
@@ -25,7 +24,9 @@ let geminiClient = null;
    ========================================================= */
 
 async function getGemini() {
-  if (!GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
     throw new Error(
       'Chưa cấu hình GEMINI_API_KEY trên server.'
     );
@@ -36,7 +37,6 @@ async function getGemini() {
   }
 
   const module = await import('@google/genai');
-
   const GoogleGenAI = module.GoogleGenAI;
 
   if (!GoogleGenAI) {
@@ -46,7 +46,7 @@ async function getGemini() {
   }
 
   geminiClient = new GoogleGenAI({
-    apiKey: GEMINI_API_KEY
+    apiKey: apiKey
   });
 
   return geminiClient;
