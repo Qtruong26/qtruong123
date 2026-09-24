@@ -14,8 +14,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: fitcore
-    ports:
-      - "3306:3306"
     volumes:
       - fitcore_mysql_data:/var/lib/mysql
       - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -45,6 +43,9 @@ services:
       BANK_BIN: 970422
       BANK_ACCOUNT_NUMBER: 0346941158
       BANK_ACCOUNT_NAME: DIEP QUANG TRUONG
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - ./frontend:/frontend:ro
     ports:
       - "4000:4000"
 

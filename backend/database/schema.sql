@@ -5,6 +5,8 @@
 -- Chạy: mysql -u root -p < schema.sql
 -- (hoặc: SOURCE schema.sql;  bên trong MySQL client sau khi đã USE đúng database)
 
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS fitcore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE fitcore;
