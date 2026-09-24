@@ -4,7 +4,7 @@
  * Đây là điểm DUY NHẤT giao tiếp với backend.
  */
 
-const API_BASE_URL = window.FITCORE_API_BASE_URL || 'https://qtruong123-production.up.railway.app/api';
+const API_BASE_URL = window.FITCORE_API_BASE_URL || 'http://localhost:5000/api'; // Thay 5000 bằng port mà backend Node.js của bạn đang chạy
 
 const TOKEN_KEY = 'fitcore_token';
 const USER_KEY = 'fitcore_user';

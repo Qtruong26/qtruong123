@@ -23,12 +23,12 @@ const reportsRoutes = require('./modules/reports.routes');
 const app = express();
 
 app.use(cors({
-  origin: 'https://fitcore-gym-app.vercel.app',
+  origin: 'http://localhost:3000', // Sửa port 3000 thành port frontend của bạn
   credentials: true
 }));
 
 app.options('*', cors({
-  origin: 'https://fitcore-gym-app.vercel.app',
+  origin: 'http://localhost:3000', // Sửa tương tự ở đây
   credentials: true
 }));
 
