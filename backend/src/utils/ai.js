@@ -86,8 +86,10 @@ async function askGemini(prompt, options = {}) {
             ? options.temperature
             : 0.7,
 
+        // Gemini 3 tính cả token "thinking" vào maxOutputTokens,
+        // nên cộng thêm 2048 để phần trả lời không bị cắt giữa câu.
         maxOutputTokens:
-          options.maxOutputTokens || 2048,
+          (options.maxOutputTokens || 2048) + 2048,
 
         systemInstruction:
           options.systemInstruction ||
