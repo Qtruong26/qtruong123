@@ -23,11 +23,16 @@ const reportsRoutes = require('./modules/reports.routes');
 const app = express();
 
 app.use(cors({
-  origin: [
-    'https://fitcore-gym-app.vercel.app',
-  ],
+  origin: 'https://fitcore-gym-app.vercel.app',
   credentials: true
 }));
+
+app.options('*', cors({
+  origin: 'https://fitcore-gym-app.vercel.app',
+  credentials: true
+}));
+
+app.use(express.json());
 
 app.use(express.json());
 
