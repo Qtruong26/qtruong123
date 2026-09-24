@@ -70,7 +70,8 @@ CREATE TABLE packages (
     name VARCHAR(120) NOT NULL,
     duration_days INT NOT NULL,
     price DECIMAL(12, 0) NOT NULL,
-    description VARCHAR(255)
+    description VARCHAR(255),
+    image_url VARCHAR(500) DEFAULT ""
 ) ENGINE = InnoDB;
 
 -- -------------------------------------------------------------------------
