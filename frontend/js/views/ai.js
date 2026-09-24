@@ -1108,8 +1108,12 @@ async function renderAiChat() {
      * Tự cuộn xuống tin nhắn mới nhất.
      */
 
-    el.scrollTop =
-      el.scrollHeight;
+   /*
+ * Tự cuộn xuống tin nhắn mới nhất.
+ */
+requestAnimationFrame(() => {
+  el.scrollTop = el.scrollHeight;
+});
 
   } catch (err) {
 
@@ -1178,81 +1182,29 @@ function focusAiChatInput() {
 /* =========================================================
    Gửi câu hỏi tự do → Gemini
    ========================================================= */
-
 async function sendAiChatMessage() {
+  const input = document.getElementById('aichat_input');
+  const question = input?.value.trim();
 
-  const input =
-    document.getElementById(
-      'aichat_input'
-    );
-
-
-  if (!input) return;
-
-
-  const question =
-    input.value.trim();
-
-
-  if (!question) {
-
-    toast(
-      'Vui lòng nhập câu hỏi.',
-      true
-    );
-
-    input.focus();
-
-    return;
-  }
-
-
-  /*
-   * Khóa nút gửi trong lúc Gemini xử lý
-   */
-
-  const buttons =
-    document.querySelectorAll(
-      '.ai-box button'
-    );
-
-
-  input.disabled = true;
-
+  if (!question) return;
 
   try {
-
-    await Api.post(
-      '/ai/chat',
-      {
-        question
-      }
-    );
-
-
-    /*
-     * Xóa ô nhập
-     */
-
+    // Xóa ô nhập ngay sau khi lấy câu hỏi
     input.value = '';
 
+    await Api.post('/ai/chat', {
+      question
+    });
 
-    /*
-     * Lấy lại lịch sử để hiển thị
-     */
-
+    // Hiển thị lại lịch sử
     await renderAiChat();
 
-  } catch (err) {
-
-    showApiError(err);
-
-  } finally {
-
-    input.disabled = false;
-
+    // Đưa con trỏ về ô nhập để hỏi câu tiếp theo
     input.focus();
 
+  } catch (err) {
+    console.error('Lỗi gửi câu hỏi AI:', err);
+    alert(err.message || 'Không thể gửi câu hỏi.');
   }
 }
 

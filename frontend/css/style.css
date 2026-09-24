@@ -1737,3 +1737,8 @@ table,
     min-width: 65px;
   }
 }
+#aichat_messages {
+  max-height: 500px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
