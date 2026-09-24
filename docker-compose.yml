@@ -38,7 +38,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root_password
       DB_NAME: fitcore
-      JWT_SECRET: change_this_to_a_long_random_secret_in_production
+      JWT_SECRET: ${JWT_SECRET:-change_this_to_a_long_random_secret_in_production}
       JWT_EXPIRES_IN: 7d
       BANK_BIN: 970422
       BANK_ACCOUNT_NUMBER: 0346941158
@@ -47,7 +47,7 @@ services:
     volumes:
       - ./frontend:/frontend:ro
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
 
 volumes:
   fitcore_mysql_data:
