@@ -22,7 +22,16 @@ const reportsRoutes = require('./modules/reports.routes');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(cors({
+  origin: [
+    'https://fitcore-gym-app.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'fitcore-backend' }));
