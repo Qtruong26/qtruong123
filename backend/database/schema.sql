@@ -5,6 +5,8 @@
 -- Chạy: mysql -u root -p < schema.sql
 -- (hoặc: SOURCE schema.sql;  bên trong MySQL client sau khi đã USE đúng database)
 
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS fitcore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE fitcore;
@@ -68,7 +70,8 @@ CREATE TABLE packages (
     name VARCHAR(120) NOT NULL,
     duration_days INT NOT NULL,
     price DECIMAL(12, 0) NOT NULL,
-    description VARCHAR(255)
+    description VARCHAR(255),
+    image_url VARCHAR(500) DEFAULT ""
 ) ENGINE = InnoDB;
 
 -- -------------------------------------------------------------------------

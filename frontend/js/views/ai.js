@@ -309,50 +309,11 @@ async function runAiSuggest() {
       'ai_output'
     ).innerHTML = `
 
-      <div class="ai-output">
-
-        <b>
-          Lịch tập tham khảo
-          — mục tiêu: ${goal}
-          (mức độ: ${level})
-        </b>
-
-        <br><br>
-
-        ${
-          plan.length
-            ? plan
-                .map(
-                  (p) => `
-                    <div
-                      style="
-                        margin-bottom:10px;
-                      "
-                    >
-                      <span class="plan-day">
-                        ${p.day || ''}
-                      </span>
-
-                      ${p.focus || ''}
-
-                      ${
-                        p.intensity
-                          ? ` — cường độ: ${p.intensity}`
-                          : ''
-                      }
-                    </div>
-                  `
-                )
-                .join('')
-            : `
-              <div class="empty-state">
-                AI chưa tạo được lịch tập.
-              </div>
-            `
-        }
-
-      </div>
-    `;
+      <div class="ai-output"><b>Lịch tập tham khảo — mục tiêu: ${goal} (mức độ: ${level})</b>${
+      plan.length
+        ? plan.map((p) => `<div style="margin-bottom:10px;"><span class="plan-day">${p.day || ''}</span>${p.focus || ''}${p.intensity ? ` — cường độ: ${p.intensity}` : ''}</div>`).join('')
+        : `<div class="empty-state">AI chưa tạo được lịch tập.</div>`
+    }</div>`;
 
 
     toast(
@@ -525,9 +486,7 @@ async function genReminder(memberId) {
         </div>
 
 
-        <div class="ai-output">
-          ${message}
-        </div>
+        <div class="ai-output">${message}</div>
 
 
         <div class="hint">
@@ -585,24 +544,8 @@ async function generateAllReminders() {
     const html =
       results
         .map(
-          (r) => `
-
-            <div
-              class="ai-output"
-              style="margin-bottom:12px;"
-            >
-
-              <b>
-                ${r.memberName}
-              </b>
-
-              <br>
-
-              ${r.message}
-
-            </div>
-
-          `
+          (r) => `<div class="ai-output" style="margin-bottom:12px;"><b>${r.memberName}</b>
+${r.message}</div>`
         )
         .join('');
 
@@ -797,22 +740,9 @@ async function runProgress(fixedId) {
       'progress_output'
     ).innerHTML = `
 
-      <div class="ai-output">
+      <div class="ai-output"><b>Tóm tắt tiến độ — ${member.name}</b>
 
-        <b>
-          Tóm tắt tiến độ
-          — ${member.name}
-        </b>
-
-        <br><br>
-
-        ${
-          result.text ||
-          result.summary ||
-          'Chưa có dữ liệu tiến độ.'
-        }
-
-      </div>
+${result.text || result.summary || 'Chưa có dữ liệu tiến độ.'}</div>
 
     `;
 

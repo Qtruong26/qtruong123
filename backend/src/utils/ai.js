@@ -1,745 +1,1172 @@
-/**
- * FitCore AI - Gemini thật
- *
- * File: backend/src/utils/ai.js
- *
- * Dùng Google Gemini API.
- * API key lấy từ:
- *   GEMINI_API_KEY
- *
- * Model:
- *   GEMINI_MODEL
- */
-
-const { todayStr, daysBetween } = require('./dateUtils');
-
-const GEMINI_MODEL =
-  process.env.GEMINI_MODEL || 'gemini-3.7-flash';
-
-let geminiClient = null;
-
 /* =========================================================
-   GEMINI CLIENT
-   Dùng dynamic import để tránh lỗi CommonJS/ESM
+   AI TRỢ LÝ - FITCORE
    ========================================================= */
 
-async function getGemini() {
-  const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!apiKey) {
-    throw new Error(
-      'Chưa cấu hình GEMINI_API_KEY trên server.'
+/* =========================================================
+   1. GỢI Ý LỊCH TẬP AI
+   ========================================================= */
+
+VIEWS.aiAssist = async function () {
+  const isMember = SESSION.role === 'member';
+
+  let defaultMember = null;
+
+  if (isMember) {
+    defaultMember = await Api.get(
+      `/members/${SESSION.memberId}`
     );
   }
 
-  if (geminiClient) {
-    return geminiClient;
-  }
+  const members = !isMember
+    ? await Api.get('/members')
+    : [];
 
-  const module = await import('@google/genai');
-  const GoogleGenAI = module.GoogleGenAI;
+  const goals = [
+    'Giảm cân',
+    'Tăng cơ',
+    'Tăng sức bền',
+    'Duy trì sức khỏe',
+    'Phục hồi chấn thương'
+  ];
 
-  if (!GoogleGenAI) {
-    throw new Error(
-      'Không thể tải GoogleGenAI từ @google/genai.'
-    );
-  }
+  const levels = [
+    'Mới bắt đầu',
+    'Trung bình',
+    'Nâng cao'
+  ];
 
-  geminiClient = new GoogleGenAI({
-    apiKey: apiKey
-  });
+  const days = [
+    'T2',
+    'T3',
+    'T4',
+    'T5',
+    'T6',
+    'T7',
+    'CN'
+  ];
 
-  return geminiClient;
-}
+  return `
+    <div class="topbar">
+      <div>
+        <div class="page-eyebrow">AI trợ lý</div>
 
+        <div class="page-title">
+          Gợi ý lịch tập AI
+        </div>
 
-/* =========================================================
-   HÀM BỎ DẤU TIẾNG VIỆT
-   Không phụ thuộc vietqr.js
-   ========================================================= */
+        <div class="page-desc">
+          AI gợi ý lịch tập tham khảo dựa trên mục tiêu,
+          thời gian rảnh và mức độ hiện tại của hội viên.
+        </div>
+      </div>
+    </div>
 
-function stripDiacritics(text = '') {
-  return String(text)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D');
-}
+    <div class="panel ai-box">
 
+      <div class="panel-head">
+        <div class="panel-title">
+          Thông tin đầu vào
+        </div>
+      </div>
 
-/* =========================================================
-   HÀM GỌI GEMINI
-   ========================================================= */
+      ${
+        !isMember
+          ? `
+            <div class="field">
+              <label>Chọn hội viên</label>
 
-async function askGemini(prompt, options = {}) {
-  const gemini = await getGemini();
-
-  const response =
-    await gemini.models.generateContent({
-      model: options.model || GEMINI_MODEL,
-
-      contents: prompt,
-
-      config: {
-        temperature:
-          options.temperature !== undefined
-            ? options.temperature
-            : 0.7,
-
-        // Gemini 3 tính cả token "thinking" vào maxOutputTokens,
-        // nên cộng thêm 2048 để phần trả lời không bị cắt giữa câu.
-        maxOutputTokens:
-          (options.maxOutputTokens || 2048) + 2048,
-
-        systemInstruction:
-          options.systemInstruction ||
+              <select
+                id="ai_member"
+                onchange="prefillAiMember()"
+              >
+                ${
+                  members
+                    .map(
+                      (m) => `
+                        <option
+                          value="${m.id}"
+                          data-goal="${m.goal || ''}"
+                          data-level="${m.level || ''}"
+                        >
+                          ${m.name}
+                        </option>
+                      `
+                    )
+                    .join('')
+                }
+              </select>
+            </div>
           `
-Bạn là trợ lý AI của hệ thống quản lý phòng gym FitCore.
-
-Quy tắc:
-
-- Trả lời bằng tiếng Việt.
-- Trả lời rõ ràng, dễ hiểu.
-- Ưu tiên sử dụng dữ liệu FitCore được cung cấp.
-- Không được bịa dữ liệu hội viên.
-- Nếu dữ liệu hệ thống không có thì phải nói rõ.
-- Không tiết lộ API key hoặc thông tin bảo mật.
-- Không đưa ra chẩn đoán y tế.
-- Với chấn thương hoặc vấn đề sức khỏe nghiêm trọng,
-  khuyên người dùng hỏi bác sĩ hoặc chuyên gia.
-- Câu trả lời nên thực tế và dễ hiểu.
-          `
+          : ''
       }
-    });
 
-  const text =
-    typeof response.text === 'function'
-      ? response.text()
-      : response.text;
+      <div class="form-row">
 
-  if (!text || !String(text).trim()) {
-    throw new Error(
-      'Gemini trả về câu trả lời rỗng.'
-    );
+        <div class="field">
+          <label>Mục tiêu</label>
+
+          <select id="ai_goal">
+            ${
+              goals
+                .map(
+                  (g) => `
+                    <option
+                      ${
+                        defaultMember &&
+                        defaultMember.goal === g
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      ${g}
+                    </option>
+                  `
+                )
+                .join('')
+            }
+          </select>
+        </div>
+
+
+        <div class="field">
+          <label>Mức độ hiện tại</label>
+
+          <select id="ai_level">
+            ${
+              levels
+                .map(
+                  (g) => `
+                    <option
+                      ${
+                        defaultMember &&
+                        defaultMember.level === g
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      ${g}
+                    </option>
+                  `
+                )
+                .join('')
+            }
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Thời gian rảnh trong tuần
+        </label>
+
+        <div
+          class="tag-row"
+          id="ai_days"
+        >
+          ${
+            days
+              .map(
+                (d, i) => `
+                  <span
+                    class="chip ${
+                      i % 2 === 0
+                        ? 'selected'
+                        : ''
+                    }"
+                    onclick="
+                      this.classList.toggle('selected')
+                    "
+                    data-day="${d}"
+                  >
+                    ${d}
+                  </span>
+                `
+              )
+              .join('')
+          }
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn btn-primary"
+        onclick="runAiSuggest()"
+      >
+        Tạo gợi ý lịch tập
+      </button>
+
+
+      <div class="ai-disclaimer">
+        ⚠️ Đây là gợi ý tham khảo do AI tạo ra dựa trên
+        dữ liệu bạn cung cấp,
+        <b>
+          không thay thế tư vấn y tế hoặc chuyên môn thể chất
+        </b>.
+        Vui lòng trao đổi với huấn luyện viên hoặc bác sĩ
+        trước khi bắt đầu chương trình tập mới.
+      </div>
+
+
+      <div id="ai_output"></div>
+
+    </div>
+  `;
+};
+
+
+/* =========================================================
+   Chọn hội viên → tự điền mục tiêu + level
+   ========================================================= */
+
+function prefillAiMember() {
+
+  const sel =
+    document.getElementById('ai_member');
+
+  if (!sel) return;
+
+  const opt =
+    sel.options[sel.selectedIndex];
+
+  const goal =
+    document.getElementById('ai_goal');
+
+  const level =
+    document.getElementById('ai_level');
+
+  if (goal) {
+    goal.value =
+      opt.dataset.goal ||
+      'Duy trì sức khỏe';
   }
 
-  return String(text).trim();
+  if (level) {
+    level.value =
+      opt.dataset.level ||
+      'Mới bắt đầu';
+  }
 }
 
 
 /* =========================================================
-   GỢI Ý LỊCH TẬP
+   Gọi API tạo lịch tập
    ========================================================= */
 
-async function suggestPlan(
-  goal,
-  availability,
-  level
-) {
-  const days =
-    availability && availability.length
-      ? availability
-      : ['T2', 'T4', 'T6'];
+async function runAiSuggest() {
 
-  const prompt = `
-Hãy xây dựng lịch tập gym tham khảo cho hội viên
-của hệ thống FitCore.
+  const goal =
+    document.getElementById('ai_goal')?.value;
 
-Mục tiêu:
-${goal}
+  const level =
+    document.getElementById('ai_level')?.value;
 
-Mức độ:
-${level}
-
-Các ngày có thể tập:
-${days.join(', ')}
-
-Yêu cầu:
-
-1. Chỉ tạo lịch cho những ngày được cung cấp.
-2. Mỗi ngày chỉ có một nội dung tập chính.
-3. Phù hợp với mục tiêu.
-4. Phù hợp với trình độ.
-5. Không đưa bài tập quá nguy hiểm.
-6. Nếu mục tiêu là phục hồi chấn thương,
-   chỉ đưa gợi ý nhẹ và nhắc tham khảo chuyên gia.
-7. Trả về JSON hợp lệ.
-8. Không thêm markdown.
-
-Cấu trúc JSON:
-
-[
-  {
-    "day": "T2",
-    "focus": "Ngực + tay sau",
-    "intensity": "trung bình"
-  }
-]
-`;
-
-  try {
-    const text = await askGemini(prompt, {
-      temperature: 0.6,
-      maxOutputTokens: 1200
-    });
-
-    const clean = text
-      .replace(/```json/gi, '')
-      .replace(/```/g, '')
-      .trim();
-
-    const result = JSON.parse(clean);
-
-    if (Array.isArray(result)) {
-      return result;
-    }
-
-    throw new Error(
-      'Gemini không trả về danh sách lịch tập hợp lệ.'
-    );
-  } catch (err) {
-    console.error(
-      'Gemini suggestPlan error:',
-      err.message
-    );
-
-    /*
-     * Fallback để hệ thống vẫn hoạt động
-     * nếu Gemini tạm thời lỗi.
-     */
-
-    const fallback = {
-      'Giảm cân': [
-        'Cardio 30 phút',
-        'HIIT nhẹ + Core',
-        'Toàn thân + Cardio'
-      ],
-
-      'Tăng cơ': [
-        'Ngực + tay sau',
-        'Lưng + tay trước',
-        'Chân + vai'
-      ],
-
-      'Tăng sức bền': [
-        'Chạy bộ',
-        'Đạp xe',
-        'Circuit toàn thân'
-      ],
-
-      'Duy trì sức khỏe': [
-        'Toàn thân nhẹ',
-        'Cardio nhẹ + giãn cơ',
-        'Functional training'
-      ],
-
-      'Phục hồi chấn thương': [
-        'Giãn cơ nhẹ',
-        'Đi bộ nhẹ',
-        'Bài tập phục hồi theo hướng dẫn chuyên môn'
-      ]
-    };
-
-    const exercises =
-      fallback[goal] ||
-      fallback['Duy trì sức khỏe'];
-
-    const intensity =
-      level === 'Mới bắt đầu'
-        ? 'nhẹ – trung bình'
-        : level === 'Nâng cao'
-          ? 'trung bình – cao'
-          : 'trung bình';
-
-    return days.map((day, index) => ({
-      day,
-      focus:
-        exercises[index % exercises.length],
-      intensity
-    }));
-  }
-}
-
-
-/* =========================================================
-   NHẮC GIA HẠN
-   ========================================================= */
-
-async function suggestReminderMessage(
-  member,
-  activePackage,
-  packageName
-) {
-  const d = activePackage
-    ? daysBetween(
-        todayStr(),
-        activePackage.end_date
+  const availability =
+    Array.from(
+      document.querySelectorAll(
+        '#ai_days .chip.selected'
       )
-    : null;
+    ).map(
+      (c) => c.dataset.day
+    );
 
-  const prompt = `
-Hãy viết một tin nhắn chăm sóc hội viên
-của phòng gym FitCore.
 
-Tên hội viên:
-${member?.name || 'Hội viên'}
+  if (!availability.length) {
 
-Gói tập:
-${packageName || 'Chưa có gói'}
+    toast(
+      'Vui lòng chọn ít nhất 1 ngày rảnh.',
+      true
+    );
 
-Ngày hết hạn:
-${activePackage?.end_date || 'Không có'}
+    return;
+  }
 
-Số ngày còn lại:
-${d === null ? 'Không có' : d}
-
-Yêu cầu:
-
-- Viết bằng tiếng Việt.
-- Thân thiện.
-- Ngắn gọn.
-- Không quá quảng cáo.
-- Nếu gói đã hết hạn thì nhắc gia hạn.
-- Nếu sắp hết hạn thì nhắc nhẹ nhàng.
-- Nếu chưa có gói thì mời đăng ký.
-- Chỉ trả về nội dung tin nhắn.
-`;
 
   try {
-    return await askGemini(prompt, {
-      temperature: 0.7,
-      maxOutputTokens: 500
-    });
-  } catch (err) {
-    console.error(
-      'Gemini reminder error:',
-      err.message
-    );
 
-    if (!activePackage) {
-      return `Chào ${member.name}, bạn hiện chưa có gói tập nào đang hoạt động. Hãy liên hệ lễ tân để được tư vấn gói phù hợp nhé!`;
-    }
-
-    if (d < 0) {
-      return `Chào ${member.name}, gói "${packageName}" của bạn đã hết hạn ${Math.abs(d)} ngày. Bạn có thể gia hạn để tiếp tục tập luyện nhé!`;
-    }
-
-    if (d <= 7) {
-      return `Chào ${member.name}, gói "${packageName}" của bạn sẽ hết hạn sau ${d} ngày. Bạn có thể gia hạn sớm để không gián đoạn việc tập luyện nhé!`;
-    }
-
-    return `Chào ${member.name}, đừng quên duy trì lịch tập của mình nhé!`;
-  }
-}
-
-
-/* =========================================================
-   TÓM TẮT TIẾN ĐỘ
-   ========================================================= */
-
-async function summarizeProgress(
-  attendanceRows
-) {
-  if (
-    !attendanceRows ||
-    !attendanceRows.length
-  ) {
-    return {
-      text:
-        'Chưa có dữ liệu điểm danh để tóm tắt tiến độ.',
-      count: 0,
-      last30: 0
-    };
-  }
-
-  const sorted = [...attendanceRows].sort(
-    (a, b) =>
-      String(a.date).localeCompare(
-        String(b.date)
-      )
-  );
-
-  const last30 = sorted.filter(
-    (a) =>
-      daysBetween(
-        a.date,
-        todayStr()
-      ) <= 30
-  );
-
-  const notesWithContent =
-    sorted.filter(
-      (a) =>
-        a.note &&
-        String(a.note).trim().length > 0
-    );
-
-  const prompt = `
-Bạn là AI phân tích tiến độ tập luyện
-của hệ thống FitCore.
-
-Dữ liệu điểm danh:
-
-${JSON.stringify(
-  sorted,
-  null,
-  2
-)}
-
-Số buổi trong 30 ngày gần nhất:
-${last30.length}
-
-Tổng số buổi:
-${sorted.length}
-
-Ghi chú:
-${JSON.stringify(
-  notesWithContent,
-  null,
-  2
-)}
-
-Hãy viết một đoạn tóm tắt tiến độ
-bằng tiếng Việt.
-
-Yêu cầu:
-
-- Đánh giá tần suất tập.
-- Nhận xét xu hướng chung.
-- Nếu có ghi chú HLV thì đề cập.
-- Đưa ra 1-2 lời khuyên đơn giản.
-- Không chẩn đoán y tế.
-- Không bịa dữ liệu.
-- Khoảng 100-150 từ.
-`;
-
-  try {
-    const text =
-      await askGemini(prompt, {
-        temperature: 0.5,
-        maxOutputTokens: 700
-      });
-
-    return {
-      text,
-      count: sorted.length,
-      last30: last30.length
-    };
-  } catch (err) {
-    console.error(
-      'Gemini progress error:',
-      err.message
-    );
-
-    let text =
-      `Trong 30 ngày gần nhất, hội viên đã tập ${last30.length} buổi, tổng cộng ${sorted.length} buổi trong lịch sử. `;
-
-    if (last30.length >= 8) {
-      text +=
-        'Tần suất tập luyện khá đều đặn.';
-    } else if (last30.length >= 4) {
-      text +=
-        'Tần suất tập luyện ở mức khá.';
-    } else {
-      text +=
-        'Tần suất tập luyện còn thấp.';
-    }
-
-    if (notesWithContent.length) {
-      const latest =
-        notesWithContent[
-          notesWithContent.length - 1
-        ];
-
-      text +=
-        ` Ghi chú gần đây: "${latest.note}".`;
-    }
-
-    return {
-      text,
-      count: sorted.length,
-      last30: last30.length
-    };
-  }
-}
-
-
-/* =========================================================
-   CHATBOT HỎI ĐÁP - GEMINI THẬT
-   ========================================================= */
-
-async function answerMemberQuestion(
-  rawQuestion,
-  ctx = {}
-) {
-  const question =
-    String(rawQuestion || '').trim();
-
-  if (!question) {
-    throw new Error(
-      'Câu hỏi không được để trống.'
-    );
-  }
-
-  const {
-    member,
-    activePackage,
-    packageName,
-    nextSchedule,
-    trainerName,
-    hasTrainer
-  } = ctx;
-
-  const prompt = `
-Bạn là chatbot AI của hệ thống quản lý
-phòng gym FitCore.
-
-THÔNG TIN HỘI VIÊN:
-
-${JSON.stringify(
-  {
-    name: member?.name || null,
-    phone: member?.phone || null,
-    email: member?.email || null,
-    goal: member?.goal || null,
-    level: member?.level || null
-  },
-  null,
-  2
-)}
-
-GÓI TẬP HIỆN TẠI:
-
-${JSON.stringify(
-  activePackage
-    ? {
-        packageName:
-          packageName || null,
-
-        startDate:
-          activePackage.start_date,
-
-        endDate:
-          activePackage.end_date,
-
-        status:
-          activePackage.status
-      }
-    : null,
-  null,
-  2
-)}
-
-LỊCH TẬP TIẾP THEO:
-
-${JSON.stringify(
-  nextSchedule || null,
-  null,
-  2
-)}
-
-HUẤN LUYỆN VIÊN:
-
-${trainerName || 'Chưa có'}
-
-CÓ HUẤN LUYỆN VIÊN:
-
-${hasTrainer ? 'Có' : 'Không'}
-
-CÂU HỎI CỦA HỘI VIÊN:
-
-${question}
-
-QUY TẮC TRẢ LỜI:
-
-1. Trả lời bằng tiếng Việt.
-2. Ưu tiên dữ liệu được cung cấp ở trên.
-3. Không tự bịa thông tin cá nhân.
-4. Nếu dữ liệu không có thì nói rõ.
-5. Nếu hỏi về gói tập thì dùng thông tin gói tập.
-6. Nếu hỏi về lịch thì dùng lịch được cung cấp.
-7. Nếu hỏi về HLV thì dùng tên HLV được cung cấp.
-8. Nếu hỏi về thanh toán, gia hạn hoặc check-in,
-   hướng dẫn theo hệ thống FitCore.
-9. Không đưa ra chẩn đoán y tế.
-10. Với chấn thương hoặc vấn đề sức khỏe nghiêm trọng,
-    khuyên người dùng hỏi bác sĩ hoặc chuyên gia.
-11. Có thể trả lời câu hỏi tự do liên quan đến
-    việc sử dụng FitCore và tập luyện.
-12. Nếu câu hỏi hoàn toàn ngoài phạm vi FitCore,
-    trả lời ngắn gọn và hướng người dùng tới
-    lễ tân hoặc HLV.
-13. Không nói rằng bạn là ChatGPT.
-14. Xưng là "trợ lý AI FitCore".
-15. Trả lời tự nhiên, không cần liệt kê quy tắc.
-`;
-
-  try {
-    const answer =
-      await askGemini(prompt, {
-        temperature: 0.65,
-        maxOutputTokens: 1000
-      });
-
-    return answer.trim();
-  } catch (err) {
-    console.error(
-      'Gemini chatbot error:',
-      err.message
-    );
-
-    return fallbackChatAnswer(
-      question,
-      ctx
-    );
-  }
-}
-
-
-/* =========================================================
-   FALLBACK CHATBOT
-   Chỉ chạy khi Gemini bị lỗi
-   ========================================================= */
-
-function fallbackChatAnswer(
-  rawQuestion,
-  ctx = {}
-) {
-  const q =
-    stripDiacritics(
-      rawQuestion
-    ).toLowerCase();
-
-  const has = (...keywords) =>
-    keywords.some(
-      (keyword) =>
-        q.includes(keyword)
-    );
-
-  const {
-    member,
-    activePackage,
-    packageName,
-    nextSchedule,
-    trainerName,
-    hasTrainer
-  } = ctx;
-
-  const memberName =
-    member?.name || 'bạn';
-
-  /* Chào hỏi */
-
-  if (
-    has(
-      'xin chao',
-      'hello',
-      'chao ban'
-    ) ||
-    q.trim() === 'hi' ||
-    q.trim() === 'chao'
-  ) {
-    return `Chào ${memberName}! Tôi là trợ lý AI FitCore. Tôi có thể giúp bạn về gói tập, lịch tập, huấn luyện viên, thanh toán và check-in.`;
-  }
-
-  /* Gói tập */
-
-  if (
-    has(
-      'goi tap',
-      'goi cua toi',
-      'het han',
-      'con bao nhieu ngay'
-    )
-  ) {
-    if (!activePackage) {
-      return 'Bạn hiện chưa có gói tập nào.';
-    }
-
-    const d =
-      daysBetween(
-        todayStr(),
-        activePackage.end_date
+    const result =
+      await Api.post(
+        '/ai/suggest-plan',
+        {
+          goal,
+          level,
+          availability
+        }
       );
 
-    if (d < 0) {
-      return `Gói "${packageName}" đã hết hạn ${Math.abs(d)} ngày.`;
-    }
 
-    return `Gói "${packageName}" còn hiệu lực đến ${activePackage.end_date}, còn ${d} ngày.`;
+    const plan =
+      Array.isArray(result.plan)
+        ? result.plan
+        : [];
+
+
+    document.getElementById(
+      'ai_output'
+    ).innerHTML = `
+
+      <div class="ai-output"><b>Lịch tập tham khảo — mục tiêu: ${goal} (mức độ: ${level})</b>${
+      plan.length
+        ? plan.map((p) => `<div style="margin-bottom:10px;"><span class="plan-day">${p.day || ''}</span>${p.focus || ''}${p.intensity ? ` — cường độ: ${p.intensity}` : ''}</div>`).join('')
+        : `<div class="empty-state">AI chưa tạo được lịch tập.</div>`
+    }</div>`;
+
+
+    toast(
+      'Đã tạo gợi ý lịch tập.'
+    );
+
+  } catch (err) {
+
+    showApiError(err);
+
   }
-
-  /* Lịch tập */
-
-  if (
-    has(
-      'lich tap',
-      'lich hen',
-      'buoi tap tiep theo'
-    )
-  ) {
-    if (!nextSchedule) {
-      return 'Bạn chưa có lịch tập sắp tới.';
-    }
-
-    return `Buổi tập tiếp theo của bạn là ${nextSchedule.date} lúc ${nextSchedule.time} với HLV ${nextSchedule.trainerName || trainerName || 'chưa xác định'}.`;
-  }
-
-  /* HLV */
-
-  if (
-    has(
-      'hlv',
-      'huan luyen vien',
-      'trainer'
-    )
-  ) {
-    if (hasTrainer) {
-      return `Huấn luyện viên phụ trách của bạn là ${trainerName}.`;
-    }
-
-    return 'Bạn hiện chưa được ghép huấn luyện viên.';
-  }
-
-  /* Thanh toán / gia hạn */
-
-  if (
-    has(
-      'gia han',
-      'dang ky goi',
-      'thanh toan',
-      'chuyen khoan',
-      'qr'
-    )
-  ) {
-    return 'Bạn vào mục "Đăng ký / gia hạn gói", chọn gói và hình thức thanh toán. Nếu chọn chuyển khoản, hệ thống sẽ hiển thị QR thanh toán.';
-  }
-
-  /* Check-in */
-
-  if (
-    has(
-      'check-in',
-      'checkin',
-      'check in',
-      'diem danh'
-    )
-  ) {
-    return 'Bạn vào mục "Check-in" và bấm "Check-in ngay" khi đến phòng gym.';
-  }
-
-  return 'Xin lỗi, Gemini hiện không phản hồi được. Bạn có thể thử lại sau hoặc liên hệ lễ tân/HLV FitCore.';
 }
 
 
 /* =========================================================
-   EXPORT
+   2. NHẮC LỊCH / GIA HẠN
    ========================================================= */
 
-module.exports = {
-  askGemini,
-  suggestPlan,
-  suggestReminderMessage,
-  summarizeProgress,
-  answerMemberQuestion
+VIEWS.aiReminder = async function () {
+
+  const members =
+    await Api.get('/members');
+
+
+  const rows =
+    members
+      .map(
+        (m) => `
+          <tr>
+
+            <td>
+              ${m.name}
+            </td>
+
+            <td>
+              ${
+                m.activePackage
+                  ? m.activePackage.packageName
+                  : '—'
+              }
+            </td>
+
+            <td>
+              ${pkgStatusBadge(
+                m.packageStatus
+              )}
+            </td>
+
+            <td class="right">
+
+              <button
+                class="icon-btn"
+                onclick="genReminder(${m.id})"
+              >
+                Tạo tin nhắn AI
+              </button>
+
+            </td>
+
+          </tr>
+        `
+      )
+      .join('');
+
+
+  return `
+
+    <div class="topbar">
+
+      <div>
+
+        <div class="page-eyebrow">
+          AI trợ lý
+        </div>
+
+        <div class="page-title">
+          Nhắc lịch / Gia hạn gói
+        </div>
+
+        <div class="page-desc">
+          AI sinh tin nhắn nhắc lịch tập hoặc gia hạn
+          gói tập, ưu tiên hội viên sắp/đã hết hạn.
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn btn-secondary"
+        onclick="generateAllReminders()"
+      >
+        Tạo tin nhắn cho tất cả hội viên cần gia hạn
+      </button>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Hội viên</th>
+              <th>Gói</th>
+              <th>Trạng thái</th>
+              <th></th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+            ${rows}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <div id="reminder_output"></div>
+
+  `;
 };
+
+
+/* =========================================================
+   Tạo một tin nhắn nhắc gia hạn
+   ========================================================= */
+
+async function genReminder(memberId) {
+
+  try {
+
+    const {
+      message
+    } =
+      await Api.get(
+        `/ai/reminder/${memberId}`
+      );
+
+
+    const members =
+      await Api.get('/members');
+
+
+    const member =
+      members.find(
+        (x) => x.id === memberId
+      );
+
+
+    document.getElementById(
+      'reminder_output'
+    ).innerHTML = `
+
+      <div class="panel ai-box">
+
+        <div
+          class="panel-title"
+          style="margin-bottom:10px;"
+        >
+          Tin nhắn gợi ý cho
+          ${member ? member.name : 'hội viên'}
+        </div>
+
+
+        <div class="ai-output">${message}</div>
+
+
+        <div class="hint">
+          Bạn có thể sao chép và gửi qua
+          SMS/Zalo/Email cho hội viên.
+        </div>
+
+      </div>
+
+    `;
+
+  } catch (err) {
+
+    showApiError(err);
+
+  }
+}
+
+
+/* =========================================================
+   Tạo tin nhắn cho tất cả hội viên cần gia hạn
+   ========================================================= */
+
+async function generateAllReminders() {
+
+  try {
+
+    const results =
+      await Api.get(
+        '/ai/reminders/bulk'
+      );
+
+
+    if (!results.length) {
+
+      document.getElementById(
+        'reminder_output'
+      ).innerHTML = `
+
+        <div class="panel">
+
+          <div class="empty-state">
+            Không có hội viên nào cần
+            nhắc gia hạn lúc này 🎉
+          </div>
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    const html =
+      results
+        .map(
+          (r) => `<div class="ai-output" style="margin-bottom:12px;"><b>${r.memberName}</b>
+${r.message}</div>`
+        )
+        .join('');
+
+
+    document.getElementById(
+      'reminder_output'
+    ).innerHTML = `
+
+      <div class="panel ai-box">
+
+        <div
+          class="panel-title"
+          style="margin-bottom:10px;"
+        >
+          Tin nhắn gợi ý
+          (${results.length} hội viên)
+        </div>
+
+        ${html}
+
+      </div>
+
+    `;
+
+
+    toast(
+      `Đã tạo ${results.length} tin nhắn nhắc gia hạn.`
+    );
+
+  } catch (err) {
+
+    showApiError(err);
+
+  }
+}
+
+
+/* =========================================================
+   3. TÓM TẮT TIẾN ĐỘ
+   ========================================================= */
+
+VIEWS.aiProgress = async function () {
+
+  const isMember =
+    SESSION.role === 'member';
+
+
+  const members =
+    !isMember
+      ? await Api.get('/members')
+      : [];
+
+
+  return `
+
+    <div class="topbar">
+
+      <div>
+
+        <div class="page-eyebrow">
+          AI trợ lý
+        </div>
+
+        <div class="page-title">
+          Tóm tắt tiến độ tập luyện
+        </div>
+
+        <div class="page-desc">
+          AI tóm tắt tiến độ tập luyện của hội viên
+          dựa trên lịch sử điểm danh.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel ai-box">
+
+      ${
+        !isMember
+          ? `
+
+            <div class="field">
+
+              <label>
+                Chọn hội viên
+              </label>
+
+              <select id="prog_member">
+
+                ${
+                  members
+                    .map(
+                      (m) => `
+                        <option
+                          value="${m.id}"
+                        >
+                          ${m.name}
+                        </option>
+                      `
+                    )
+                    .join('')
+                }
+
+              </select>
+
+            </div>
+
+
+            <button
+              class="btn btn-primary"
+              onclick="runProgress()"
+            >
+              Tạo tóm tắt
+            </button>
+
+          `
+          : `
+
+            <button
+              class="btn btn-primary"
+              onclick="
+                runProgress(${SESSION.memberId})
+              "
+            >
+              Xem tóm tắt tiến độ của tôi
+            </button>
+
+          `
+      }
+
+
+      <div class="ai-disclaimer">
+
+        ⚠️ Tóm tắt này do AI tạo tự động từ dữ liệu
+        điểm danh, chỉ mang tính tham khảo và không
+        thay thế đánh giá chuyên môn.
+
+      </div>
+
+
+      <div id="progress_output"></div>
+
+    </div>
+
+  `;
+};
+
+
+/* =========================================================
+   Chạy tóm tắt tiến độ
+   ========================================================= */
+
+async function runProgress(fixedId) {
+
+  const memberId =
+    fixedId ||
+    Number(
+      document.getElementById(
+        'prog_member'
+      )?.value
+    );
+
+
+  if (!memberId) {
+
+    toast(
+      'Không xác định được hội viên.',
+      true
+    );
+
+    return;
+  }
+
+
+  try {
+
+    const result =
+      await Api.get(
+        `/ai/progress-summary/${memberId}`
+      );
+
+
+    const member =
+      await Api.get(
+        `/members/${memberId}`
+      );
+
+
+    document.getElementById(
+      'progress_output'
+    ).innerHTML = `
+
+      <div class="ai-output"><b>Tóm tắt tiến độ — ${member.name}</b>
+
+${result.text || result.summary || 'Chưa có dữ liệu tiến độ.'}</div>
+
+    `;
+
+  } catch (err) {
+
+    showApiError(err);
+
+  }
+}
+
+
+/* =========================================================
+   4. CHATBOT AI GEMINI
+   ========================================================= */
+
+VIEWS.aiChatBot = async function () {
+
+  const SUGGESTIONS = [
+
+    'Gói tập của tôi còn bao nhiêu ngày?',
+
+    'Lịch tập tiếp theo của tôi là khi nào?',
+
+    'Làm sao để gia hạn gói tập?',
+
+    'Huấn luyện viên của tôi là ai?',
+
+    'Làm sao để check-in?'
+
+  ];
+
+
+  return `
+
+    <div class="topbar">
+
+      <div>
+
+        <div class="page-eyebrow">
+          AI trợ lý
+        </div>
+
+        <div class="page-title">
+          Hỏi đáp AI
+        </div>
+
+        <div class="page-desc">
+          Trợ lý AI sử dụng Gemini để trả lời câu hỏi
+          về gói tập, lịch tập, huấn luyện viên,
+          check-in, thanh toán và các vấn đề liên quan
+          đến FitCore.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel ai-box">
+
+      <!-- Lịch sử chat -->
+
+      <div id="aichat_output">
+
+        <div class="empty-state">
+          Đang tải lịch sử hội thoại...
+        </div>
+
+      </div>
+
+
+      <!-- Câu hỏi demo -->
+
+      <div
+        class="tag-row"
+        style="
+          margin-top:10px;
+          margin-bottom:12px;
+        "
+      >
+
+        ${SUGGESTIONS
+          .map(
+            (s) => `
+
+              <span
+                class="chip"
+                onclick="
+                  sendAiChatQuick(
+                    '${s.replace(
+                      /'/g,
+                      "\\'"
+                    )}'
+                  )
+                "
+              >
+                ${s}
+              </span>
+
+            `
+          )
+          .join('')}
+
+      </div>
+
+
+      <!-- Nhập câu hỏi tự do -->
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          align-items:center;
+        "
+      >
+
+        <input
+          id="aichat_input"
+          type="text"
+          placeholder="
+            Nhập bất kỳ câu hỏi nào bạn muốn hỏi Gemini...
+          "
+          autocomplete="off"
+          onkeydown="
+            if(event.key === 'Enter')
+              sendAiChatMessage()
+          "
+        />
+
+
+        <button
+          class="btn btn-primary"
+          onclick="sendAiChatMessage()"
+        >
+          Gửi
+        </button>
+
+      </div>
+
+
+      <!-- Nút hỏi câu khác -->
+
+      <div
+        style="
+          margin-top:10px;
+        "
+      >
+
+        <button
+          class="btn btn-secondary"
+          onclick="focusAiChatInput()"
+        >
+          + Hỏi câu hỏi khác
+        </button>
+
+      </div>
+
+
+      <div
+        class="ai-disclaimer"
+        style="margin-top:14px;"
+      >
+
+        ⚠️ Trợ lý AI trả lời tự động và chỉ mang tính
+        tham khảo. Với vấn đề khẩn cấp, y tế hoặc
+        chuyên môn thể chất, vui lòng liên hệ lễ tân,
+        huấn luyện viên hoặc bác sĩ.
+
+      </div>
+
+    </div>
+
+  `;
+};
+
+
+/* =========================================================
+   Render lịch sử chat
+   ========================================================= */
+
+async function renderAiChat() {
+
+  const el =
+    document.getElementById(
+      'aichat_output'
+    );
+
+
+  if (!el) return;
+
+
+  try {
+
+    const thread =
+      await Api.get(
+        '/ai/chat/history'
+      );
+
+
+    if (!thread.length) {
+
+      el.innerHTML = `
+
+        <div class="empty-state">
+
+          Chào bạn! 👋
+
+          <br><br>
+
+          Hãy chọn một câu hỏi mẫu
+          hoặc nhập câu hỏi bất kỳ bên dưới
+          để bắt đầu trò chuyện với Gemini.
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    el.innerHTML = `
+
+      <div
+        class="chat-bubble-row"
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+        "
+      >
+
+        ${thread
+          .map(
+            (c) => {
+
+              const isUser =
+                c.sender === 'user';
+
+              return `
+
+                <div
+                  style="
+                    align-self:
+                      ${
+                        isUser
+                          ? 'flex-end'
+                          : 'flex-start'
+                      };
+                    max-width:80%;
+                  "
+                >
+
+                  <div
+                    class="chat-bubble"
+                    style="
+                      background:
+                        ${
+                          isUser
+                            ? 'var(--volt)'
+                            : 'var(--surface-2)'
+                        };
+
+                      color:
+                        ${
+                          isUser
+                            ? '#10130A'
+                            : 'var(--chalk)'
+                        };
+
+                      padding:10px 14px;
+                      border-radius:12px;
+                      white-space:pre-wrap;
+                      word-break:break-word;
+                    "
+                  >
+                    ${escapeAiHtml(c.text)}
+                  </div>
+
+                </div>
+
+              `;
+            }
+          )
+          .join('')}
+
+      </div>
+
+    `;
+
+
+    /*
+     * Tự cuộn xuống tin nhắn mới nhất.
+     */
+
+   /*
+ * Tự cuộn xuống tin nhắn mới nhất.
+ */
+requestAnimationFrame(() => {
+  el.scrollTop = el.scrollHeight;
+});
+
+  } catch (err) {
+
+    el.innerHTML = `
+
+      <div class="empty-state">
+
+        Không thể tải lịch sử hội thoại.
+
+      </div>
+
+    `;
+
+    console.error(
+      'AI chat history error:',
+      err
+    );
+  }
+}
+
+
+/* =========================================================
+   Click câu hỏi demo
+   ========================================================= */
+
+function sendAiChatQuick(text) {
+
+  const input =
+    document.getElementById(
+      'aichat_input'
+    );
+
+
+  if (!input) return;
+
+
+  input.value = text;
+
+  input.focus();
+
+  sendAiChatMessage();
+}
+
+
+/* =========================================================
+   Nút "+ Hỏi câu hỏi khác"
+   ========================================================= */
+
+function focusAiChatInput() {
+
+  const input =
+    document.getElementById(
+      'aichat_input'
+    );
+
+
+  if (!input) return;
+
+
+  input.value = '';
+
+  input.focus();
+}
+
+
+/* =========================================================
+   Gửi câu hỏi tự do → Gemini
+   ========================================================= */
+async function sendAiChatMessage() {
+  const input = document.getElementById('aichat_input');
+  const question = input?.value.trim();
+
+  if (!question) return;
+
+  try {
+    // Xóa ô nhập ngay sau khi lấy câu hỏi
+    input.value = '';
+
+    await Api.post('/ai/chat', {
+      question
+    });
+
+    // Hiển thị lại lịch sử
+    await renderAiChat();
+
+    // Đưa con trỏ về ô nhập để hỏi câu tiếp theo
+    input.focus();
+
+  } catch (err) {
+    console.error('Lỗi gửi câu hỏi AI:', err);
+    alert(err.message || 'Không thể gửi câu hỏi.');
+  }
+}
+
+
+/* =========================================================
+   Escape HTML
+   Tránh text Gemini chứa HTML/script
+   ========================================================= */
+
+function escapeAiHtml(value) {
+
+  return String(
+    value ?? ''
+  )
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+}

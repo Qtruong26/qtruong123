@@ -4,7 +4,7 @@
  * Đây là điểm DUY NHẤT giao tiếp với backend.
  */
 
-const API_BASE_URL = window.FITCORE_API_BASE_URL || 'http://localhost:5000/api'; // Thay 5000 bằng port mà backend Node.js của bạn đang chạy
+const API_BASE_URL = window.FITCORE_API_BASE_URL || '/api'; // cùng origin với backend (backend phục vụ luôn frontend)
 
 const TOKEN_KEY = 'fitcore_token';
 const USER_KEY = 'fitcore_user';
