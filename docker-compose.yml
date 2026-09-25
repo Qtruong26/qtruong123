@@ -8,14 +8,12 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0-debian
     container_name: fitcore-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: fitcore
-    ports:
-      - "3306:3306"
     volumes:
       - fitcore_mysql_data:/var/lib/mysql
       - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -23,7 +21,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   backend:
     build: ./backend
@@ -40,13 +38,16 @@ services:
       DB_USER: root
       DB_PASSWORD: root_password
       DB_NAME: fitcore
-      JWT_SECRET: change_this_to_a_long_random_secret_in_production
+      JWT_SECRET: ${JWT_SECRET:-change_this_to_a_long_random_secret_in_production}
       JWT_EXPIRES_IN: 7d
       BANK_BIN: 970422
       BANK_ACCOUNT_NUMBER: 0346941158
       BANK_ACCOUNT_NAME: DIEP QUANG TRUONG
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - ./frontend:/frontend:ro
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
 
 volumes:
   fitcore_mysql_data:
