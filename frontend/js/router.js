@@ -26,7 +26,7 @@ const NAV_ITEMS = [
     { id: 'reports', label: 'Báo cáo', roles: ['admin', 'reception'] },
   ]},
   { group: 'AI trợ lý', items: [
-    { id: 'aiChatBot', label: 'Hỏi đáp AI', roles: ['member'] },
+    { id: 'aiChatBot', label: 'Hỏi đáp AI', roles: ['admin', 'reception', 'trainer', 'member'] },
     { id: 'aiAssist', label: 'Gợi ý lịch tập AI', roles: ['admin', 'reception', 'trainer', 'member'] },
     { id: 'aiReminder', label: 'Nhắc lịch / gia hạn', roles: ['admin', 'reception'] },
     { id: 'aiProgress', label: 'Tóm tắt tiến độ', roles: ['admin', 'trainer', 'member'] },

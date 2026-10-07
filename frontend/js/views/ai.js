@@ -758,165 +758,132 @@ ${result.text || result.summary || 'Chưa có dữ liệu tiến độ.'}</div>
    4. CHATBOT AI GEMINI
    ========================================================= */
 
+/* =========================================================
+   4. CHATBOT AI GEMINI TOÀN DIỆN (HỎI ĐÁP CẢ NGOÀI LỀ)
+   ========================================================= */
+
 VIEWS.aiChatBot = async function () {
-
-  const SUGGESTIONS = [
-
+  const FITCORE_SUGGESTIONS = [
     'Gói tập của tôi còn bao nhiêu ngày?',
-
     'Lịch tập tiếp theo của tôi là khi nào?',
-
-    'Làm sao để gia hạn gói tập?',
-
-    'Huấn luyện viên của tôi là ai?',
-
-    'Làm sao để check-in?'
-
+    'Làm sao để gia hạn gói tập hoặc check-in?',
+    'Huấn luyện viên phụ trách của tôi là ai?'
   ];
 
+  const GENERAL_SUGGESTIONS = [
+    'Làm sao để duy trì thói quen tập khi bận rộn?',
+    'Gợi ý thực đơn ăn uống lành mạnh dễ nấu cho người đi làm?',
+    'Cho tôi vài lời khuyên giảm stress sau ngày làm việc mệt mỏi?',
+    'Giải thích hiện tượng đau nhức cơ sau khi tập (DOMS)?',
+    'Nên uống bao nhiêu nước mỗi ngày và cách phân bổ hợp lý?'
+  ];
 
   return `
-
     <div class="topbar">
-
       <div>
-
-        <div class="page-eyebrow">
-          AI trợ lý
-        </div>
-
-        <div class="page-title">
-          Hỏi đáp AI
-        </div>
-
+        <div class="page-eyebrow">AI Trợ Lý Đa Năng</div>
+        <div class="page-title">Hỏi đáp AI Toàn diện</div>
         <div class="page-desc">
-          Trợ lý AI sử dụng Gemini để trả lời câu hỏi
-          về gói tập, lịch tập, huấn luyện viên,
-          check-in, thanh toán và các vấn đề liên quan
-          đến FitCore.
+          Trợ lý thông minh hỗ trợ giải đáp mọi thông tin FitCore (gói tập, lịch tập, PT, check-in, thanh toán) 
+          <strong>và sẵn sàng trò chuyện, trả lời bất kỳ câu hỏi đời sống, khoa học, kiến thức ngoài lề nào</strong> cùng bạn.
         </div>
-
       </div>
-
     </div>
 
-
     <div class="panel ai-box">
-
-      <!-- Lịch sử chat -->
-
-      <div id="aichat_output">
-
+      <!-- Lịch sử hội thoại -->
+      <div id="aichat_output" style="max-height: 480px; min-height: 240px; overflow-y: auto; padding-right: 6px;">
         <div class="empty-state">
           Đang tải lịch sử hội thoại...
         </div>
-
       </div>
 
+      <!-- Khung gợi ý câu hỏi -->
+      <div style="margin-top: 14px; margin-bottom: 12px;">
+        <div style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+          🏋️ Về FitCore & Phòng tập:
+        </div>
+        <div class="tag-row" style="margin-bottom: 10px;">
+          ${FITCORE_SUGGESTIONS.map(s => `
+            <span class="chip" onclick="sendAiChatQuick('${s.replace(/'/g, "\\'")}')">
+              ${s}
+            </span>
+          `).join('')}
+        </div>
 
-      <!-- Câu hỏi demo -->
-
-      <div
-        class="tag-row"
-        style="
-          margin-top:10px;
-          margin-bottom:12px;
-        "
-      >
-
-        ${SUGGESTIONS
-          .map(
-            (s) => `
-
-              <span
-                class="chip"
-                onclick="
-                  sendAiChatQuick(
-                    '${s.replace(
-                      /'/g,
-                      "\\'"
-                    )}'
-                  )
-                "
-              >
-                ${s}
-              </span>
-
-            `
-          )
-          .join('')}
-
+        <div style="font-size: 12px; font-weight: 600; color: var(--volt); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+          💡 Câu hỏi ngoài lề, đời sống & kiến thức:
+        </div>
+        <div class="tag-row">
+          ${GENERAL_SUGGESTIONS.map(s => `
+            <span class="chip" style="border-color: rgba(198, 255, 58, 0.25);" onclick="sendAiChatQuick('${s.replace(/'/g, "\\'")}')">
+              ${s}
+            </span>
+          `).join('')}
+        </div>
       </div>
 
-
-      <!-- Nhập câu hỏi tự do -->
-
-      <div
-        style="
-          display:flex;
-          gap:8px;
-          align-items:center;
-        "
-      >
-
+      <!-- Ô nhập câu hỏi tự do -->
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 12px;">
         <input
           id="aichat_input"
           type="text"
-          placeholder="
-            Nhập bất kỳ câu hỏi nào bạn muốn hỏi Gemini...
-          "
+          placeholder="Hỏi bất kỳ điều gì (về gym, lịch tập hoặc câu hỏi ngoài lề, kiến thức, đời sống...)..."
           autocomplete="off"
-          onkeydown="
-            if(event.key === 'Enter')
-              sendAiChatMessage()
-          "
+          style="flex: 1;"
+          onkeydown="if(event.key === 'Enter') sendAiChatMessage()"
         />
 
-
-        <button
-          class="btn btn-primary"
-          onclick="sendAiChatMessage()"
-        >
-          Gửi
+        <button id="aichat_send_btn" class="btn btn-primary" onclick="sendAiChatMessage()">
+          Gửi câu hỏi
         </button>
-
       </div>
 
-
-      <!-- Nút hỏi câu khác -->
-
-      <div
-        style="
-          margin-top:10px;
-        "
-      >
-
-        <button
-          class="btn btn-secondary"
-          onclick="focusAiChatInput()"
-        >
+      <!-- Các nút thao tác bổ trợ -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
+        <button class="btn btn-secondary" style="font-size: 13px;" onclick="focusAiChatInput()">
           + Hỏi câu hỏi khác
         </button>
 
+        <button class="btn" style="font-size: 12px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="clearAiChatHistory()">
+          🗑️ Xóa lịch sử trò chuyện
+        </button>
       </div>
 
-
-      <div
-        class="ai-disclaimer"
-        style="margin-top:14px;"
-      >
-
-        ⚠️ Trợ lý AI trả lời tự động và chỉ mang tính
-        tham khảo. Với vấn đề khẩn cấp, y tế hoặc
-        chuyên môn thể chất, vui lòng liên hệ lễ tân,
-        huấn luyện viên hoặc bác sĩ.
-
+      <div class="ai-disclaimer" style="margin-top: 14px;">
+        💡 <strong>Mẹo:</strong> Bạn có thể trò chuyện tự nhiên với trợ lý AI như một người bạn — từ kỹ thuật hít thở, dinh dưỡng cho tới việc quản lý thời gian, công việc hay chuyện phiếm ngoài lề.
       </div>
-
     </div>
-
   `;
 };
+
+
+/* =========================================================
+   Format Markdown đơn giản & an toàn
+   ========================================================= */
+
+function formatAiMarkdown(text) {
+  if (!text) return '';
+  let str = escapeAiHtml(text);
+
+  // In đậm **text**
+  str = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // In nghiêng *text*
+  str = str.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+  // Gạch đầu dòng * hoặc -
+  str = str.replace(/^[*-]\s+(.+)$/gm, '<li style="margin-left: 18px;">$1</li>');
+
+  // Tiêu đề ###
+  str = str.replace(/^###\s+(.+)$/gm, '<h4 style="margin: 8px 0 4px; color: var(--volt); font-size: 14px;">$1</h4>');
+  str = str.replace(/^##\s+(.+)$/gm, '<h3 style="margin: 10px 0 6px; color: var(--volt); font-size: 15px;">$1</h3>');
+
+  // Đoạn code inline `code`
+  str = str.replace(/`(.*?)`/g, '<code style="background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; font-family: monospace;">$1</code>');
+
+  return str;
+}
 
 
 /* =========================================================
@@ -924,166 +891,82 @@ VIEWS.aiChatBot = async function () {
    ========================================================= */
 
 async function renderAiChat() {
-
-  const el =
-    document.getElementById(
-      'aichat_output'
-    );
-
-
+  const el = document.getElementById('aichat_output');
   if (!el) return;
 
-
   try {
+    const thread = await Api.get('/ai/chat/history');
 
-    const thread =
-      await Api.get(
-        '/ai/chat/history'
-      );
-
-
-    if (!thread.length) {
-
+    if (!Array.isArray(thread) || !thread.length) {
       el.innerHTML = `
-
-        <div class="empty-state">
-
-          Chào bạn! 👋
-
-          <br><br>
-
-          Hãy chọn một câu hỏi mẫu
-          hoặc nhập câu hỏi bất kỳ bên dưới
-          để bắt đầu trò chuyện với Gemini.
-
+        <div class="empty-state" style="padding: 30px 10px;">
+          <div style="font-size: 26px; margin-bottom: 8px;">👋</div>
+          <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Chào bạn! Mình là FitCore AI Assistant.</div>
+          <div style="color: var(--muted); font-size: 13px; max-width: 480px; margin: 0 auto;">
+            Hãy chọn một câu hỏi gợi ý phía dưới hoặc nhập bất kỳ câu hỏi nào bạn muốn hỏi — 
+            từ gói tập, check-in tại FitCore cho đến các chủ đề khoa học, học tập, đời sống ngoài lề!
+          </div>
         </div>
-
       `;
-
       return;
     }
 
-
     el.innerHTML = `
-
-      <div
-        class="chat-bubble-row"
-        style="
-          display:flex;
-          flex-direction:column;
-          gap:10px;
-        "
-      >
-
-        ${thread
-          .map(
-            (c) => {
-
-              const isUser =
-                c.sender === 'user';
-
-              return `
-
-                <div
-                  style="
-                    align-self:
-                      ${
-                        isUser
-                          ? 'flex-end'
-                          : 'flex-start'
-                      };
-                    max-width:80%;
-                  "
-                >
-
-                  <div
-                    class="chat-bubble"
-                    style="
-                      background:
-                        ${
-                          isUser
-                            ? 'var(--volt)'
-                            : 'var(--surface-2)'
-                        };
-
-                      color:
-                        ${
-                          isUser
-                            ? '#10130A'
-                            : 'var(--chalk)'
-                        };
-
-                      padding:10px 14px;
-                      border-radius:12px;
-                      white-space:pre-wrap;
-                      word-break:break-word;
-                    "
-                  >
-                    ${escapeAiHtml(c.text)}
-                  </div>
-
-                </div>
-
-              `;
-            }
-          )
-          .join('')}
-
+      <div class="chat-bubble-row" style="display: flex; flex-direction: column; gap: 12px;">
+        ${thread.map((c) => {
+          const isUser = c.sender === 'user';
+          return `
+            <div style="align-self: ${isUser ? 'flex-end' : 'flex-start'}; max-width: 82%;">
+              <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: ${isUser ? 'right' : 'left'};">
+                ${isUser ? 'Bạn' : '🤖 FitCore AI'}
+              </div>
+              <div
+                class="chat-bubble"
+                style="
+                  background: ${isUser ? 'var(--volt)' : 'var(--surface-2)'};
+                  color: ${isUser ? '#10130A' : 'var(--chalk)'};
+                  padding: 10px 14px;
+                  border-radius: ${isUser ? '14px 14px 2px 14px' : '14px 14px 14px 2px'};
+                  white-space: pre-wrap;
+                  word-break: break-word;
+                  line-height: 1.55;
+                  font-size: 13.5px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+                "
+              >
+                ${formatAiMarkdown(c.text)}
+              </div>
+            </div>
+          `;
+        }).join('')}
       </div>
-
     `;
 
-
-    /*
-     * Tự cuộn xuống tin nhắn mới nhất.
-     */
-
-   /*
- * Tự cuộn xuống tin nhắn mới nhất.
- */
-requestAnimationFrame(() => {
-  el.scrollTop = el.scrollHeight;
-});
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
 
   } catch (err) {
-
     el.innerHTML = `
-
       <div class="empty-state">
-
-        Không thể tải lịch sử hội thoại.
-
+        Không thể tải lịch sử hội thoại. Vui lòng thử lại sau.
       </div>
-
     `;
-
-    console.error(
-      'AI chat history error:',
-      err
-    );
+    console.error('AI chat history error:', err);
   }
 }
 
 
 /* =========================================================
-   Click câu hỏi demo
+   Click câu hỏi gợi ý
    ========================================================= */
 
 function sendAiChatQuick(text) {
-
-  const input =
-    document.getElementById(
-      'aichat_input'
-    );
-
-
+  const input = document.getElementById('aichat_input');
   if (!input) return;
 
-
   input.value = text;
-
   input.focus();
-
   sendAiChatMessage();
 }
 
@@ -1093,80 +976,111 @@ function sendAiChatQuick(text) {
    ========================================================= */
 
 function focusAiChatInput() {
-
-  const input =
-    document.getElementById(
-      'aichat_input'
-    );
-
-
+  const input = document.getElementById('aichat_input');
   if (!input) return;
 
-
   input.value = '';
-
   input.focus();
+}
+
+
+/* =========================================================
+   Xóa lịch sử trò chuyện
+   ========================================================= */
+
+async function clearAiChatHistory() {
+  if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử cuộc trò chuyện AI không?')) {
+    return;
+  }
+
+  try {
+    await Api.delete('/ai/chat/history');
+    if (typeof showToast === 'function') {
+      showToast('Đã xóa sạch lịch sử trò chuyện.', 'success');
+    }
+    await renderAiChat();
+    focusAiChatInput();
+  } catch (err) {
+    console.error('Lỗi xóa lịch sử:', err);
+    alert(err.message || 'Không thể xóa lịch sử.');
+  }
 }
 
 
 /* =========================================================
    Gửi câu hỏi tự do → Gemini
    ========================================================= */
+
 async function sendAiChatMessage() {
   const input = document.getElementById('aichat_input');
+  const btn = document.getElementById('aichat_send_btn');
+  const outputEl = document.getElementById('aichat_output');
   const question = input?.value.trim();
 
   if (!question) return;
 
   try {
-    // Xóa ô nhập ngay sau khi lấy câu hỏi
     input.value = '';
+    if (btn) btn.disabled = true;
 
-    await Api.post('/ai/chat', {
-      question
-    });
+    // Hiển thị ngay tin nhắn của người dùng + bong bóng đang suy nghĩ
+    let bubbleRow = outputEl.querySelector('.chat-bubble-row');
+    if (!bubbleRow) {
+      outputEl.innerHTML = '<div class="chat-bubble-row" style="display: flex; flex-direction: column; gap: 12px;"></div>';
+      bubbleRow = outputEl.querySelector('.chat-bubble-row');
+    }
 
-    // Hiển thị lại lịch sử
+    const tempUserBubble = document.createElement('div');
+    tempUserBubble.style.cssText = 'align-self: flex-end; max-width: 82%;';
+    tempUserBubble.innerHTML = `
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: right;">Bạn</div>
+      <div class="chat-bubble" style="background: var(--volt); color: #10130A; padding: 10px 14px; border-radius: 14px 14px 2px 14px; font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;">
+        ${escapeAiHtml(question)}
+      </div>
+    `;
+    bubbleRow.appendChild(tempUserBubble);
+
+    const tempThinkingBubble = document.createElement('div');
+    tempThinkingBubble.id = 'aichat_thinking_indicator';
+    tempThinkingBubble.style.cssText = 'align-self: flex-start; max-width: 82%;';
+    tempThinkingBubble.innerHTML = `
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px;">🤖 FitCore AI</div>
+      <div class="chat-bubble" style="background: var(--surface-2); color: var(--chalk); padding: 10px 14px; border-radius: 14px 14px 14px 2px; font-size: 13px; font-style: italic;">
+        ✨ Đang suy nghĩ và soạn câu trả lời...
+      </div>
+    `;
+    bubbleRow.appendChild(tempThinkingBubble);
+
+    outputEl.scrollTop = outputEl.scrollHeight;
+
+    // Gửi request API
+    await Api.post('/ai/chat', { question });
+
+    // Cập nhật lại lịch sử hoàn chỉnh
     await renderAiChat();
 
-    // Đưa con trỏ về ô nhập để hỏi câu tiếp theo
     input.focus();
 
   } catch (err) {
     console.error('Lỗi gửi câu hỏi AI:', err);
     alert(err.message || 'Không thể gửi câu hỏi.');
+    await renderAiChat();
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 
 /* =========================================================
    Escape HTML
-   Tránh text Gemini chứa HTML/script
+   Tránh text chứa ký tự HTML độc hại
    ========================================================= */
 
 function escapeAiHtml(value) {
-
-  return String(
-    value ?? ''
-  )
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-    .replace(
-      /</g,
-      '&lt;'
-    )
-    .replace(
-      />/g,
-      '&gt;'
-    )
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-    .replace(
-      /'/g,
-      '&#039;'
-    );
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }

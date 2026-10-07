@@ -190,10 +190,10 @@ router.post('/login', async (req, res, next) => {
 
     const inputUsername = username.trim();
 
-    // Tìm tài khoản chính xác theo Username
+    // Tìm tài khoản theo Username hoặc Số điện thoại
     const [rows] = await pool.query(
-      'SELECT * FROM users WHERE username = ?',
-      [inputUsername]
+      'SELECT * FROM users WHERE username = ? OR (phone = ? AND phone != "")',
+      [inputUsername, inputUsername]
     );
 
     if (!rows.length) {

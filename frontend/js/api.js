@@ -93,4 +93,6 @@ const Api = {
   put: (path, body) => apiRequest('PUT', path, body),
 
   del: (path) => apiRequest('DELETE', path),
+
+  delete: (path) => apiRequest('DELETE', path),
 };
