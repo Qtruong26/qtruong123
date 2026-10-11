@@ -3,11 +3,20 @@ VIEWS.reports = async function () {
   const maxRev = Math.max(1, ...s.revenueByPackage.map((r) => Number(r.total)));
   return `
   <div class="topbar">
-    <div><div class="page-eyebrow">Vận hành</div><div class="page-title">Báo cáo</div>
-    <div class="page-desc">Xuất báo cáo hội viên, lịch tập và doanh thu theo gói.</div></div>
+    <div>
+      <div class="page-eyebrow">Tài chính &amp; Vận hành</div>
+      <div class="page-title">Báo Cáo Doanh Thu &amp; Thống Kê Trung Tâm</div>
+      <div class="page-desc">Tổng hợp tỷ lệ hội viên, phân bổ doanh thu theo từng gói thẻ tập và xuất dữ liệu báo cáo chuyên nghiệp.</div>
+    </div>
     <div class="toolbar">
-      <button class="btn btn-secondary" onclick="exportCSV('members')">Xuất CSV hội viên</button>
-      <button class="btn btn-secondary" onclick="exportCSV('schedules')">Xuất CSV lịch tập</button>
+      <button class="btn btn-secondary" onclick="exportCSV('members')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Xuất CSV Hội viên
+      </button>
+      <button class="btn btn-secondary" onclick="exportCSV('schedules')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Xuất CSV Lịch tập
+      </button>
     </div>
   </div>
   <div class="grid grid-3" style="margin-bottom:20px;">

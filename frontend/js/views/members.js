@@ -28,19 +28,57 @@ VIEWS.members = async function () {
     </tr>`;
   }).join('');
 
+  const activeCount = members.filter(m => m.packageStatus === 'active').length;
+  const expiringCount = members.filter(m => m.packageStatus === 'expiring').length;
+  const expiredCount = members.filter(m => m.packageStatus === 'expired').length;
+
   return `
   <div class="topbar">
     <div>
-      <div class="page-eyebrow">Vận hành</div>
-      <div class="page-title">Hội viên</div>
-      <div class="page-desc">Quản lý hồ sơ hội viên và trạng thái gói tập hiện tại.</div>
+      <div class="page-eyebrow">Hồ sơ &amp; Thẻ tập</div>
+      <div class="page-title">Quản lý Hội viên Câu lạc bộ</div>
+      <div class="page-desc">Theo dõi hồ sơ cá nhân, trạng thái gói tập, ngày hết hạn và quyền lợi tập luyện của từng hội viên.</div>
     </div>
-    ${canManage ? `<button class="btn btn-primary" onclick="editMember(null)">+ Thêm hội viên</button>` : ''}
+    ${canManage ? `
+      <button class="btn btn-primary" onclick="editMember(null)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        + Thêm hội viên
+      </button>` : ''}
   </div>
+
+  <div class="grid grid-4" style="margin-bottom:20px;">
+    <div class="stat-tile">
+      <div class="bar" style="background:var(--volt);"></div>
+      <div class="stat-label">Tổng số hội viên</div>
+      <div class="stat-value">${members.length}</div>
+      <div class="stat-sub">Đăng ký trong hệ thống</div>
+    </div>
+    <div class="stat-tile">
+      <div class="bar" style="background:var(--steel);"></div>
+      <div class="stat-label">Đang hoạt động</div>
+      <div class="stat-value" style="color:var(--volt);">${activeCount}</div>
+      <div class="stat-sub">Thẻ tập còn hạn sử dụng</div>
+    </div>
+    <div class="stat-tile">
+      <div class="bar" style="background:var(--amber);"></div>
+      <div class="stat-label">Sắp hết hạn (≤7 ngày)</div>
+      <div class="stat-value" style="color:var(--amber);">${expiringCount}</div>
+      <div class="stat-sub">Cần liên hệ chăm sóc &amp; gia hạn</div>
+    </div>
+    <div class="stat-tile">
+      <div class="bar" style="background:var(--signal);"></div>
+      <div class="stat-label">Đã hết hạn</div>
+      <div class="stat-value" style="color:var(--signal);">${expiredCount}</div>
+      <div class="stat-sub">Chưa gia hạn gói mới</div>
+    </div>
+  </div>
+
   <div class="panel">
     <div class="panel-head">
-      <div class="toolbar"><input class="search-input" placeholder="Tìm theo tên / SĐT..." oninput="filterMembers(this.value)"></div>
-      <div class="hint">${members.length} hội viên</div>
+      <div class="toolbar">
+        <input class="search-input" placeholder="Tìm theo tên, SĐT..." oninput="filterMembers(this.value)">
+      </div>
+      <div class="hint">Danh sách ${members.length} hội viên</div>
     </div>
     <div class="table-wrap">
       <table id="memberTable">
@@ -143,7 +181,7 @@ function openPromoteModal(userId, userName) {
 
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Hủy</button>
-      <button class="btn btn-primary" style="background:#c6ff3a; color:#12151a; font-weight:600;" onclick="submitPromote(${userId})">Xác nhận thăng chức</button>
+      <button class="btn btn-primary" style="background: linear-gradient(135deg, #FF2A4D 0%, #FF6200 100%); color: #ffffff; font-weight:700; border:none; box-shadow: 0 4px 14px rgba(255,42,77,0.4);" onclick="submitPromote(${userId})">Xác nhận thăng chức</button>
     </div>
   `);
 }

@@ -688,11 +688,11 @@ VIEWS.myProgress = async function () {
   ]);
   const attTop = attendance.slice(0, 15);
   return `
-  <div class="topbar"><div><div class="page-eyebrow">Tài khoản của tôi</div><div class="page-title">Theo dõi quá trình tập luyện</div>
-    <div class="page-desc">Tổng hợp lịch sử tập luyện, tóm tắt AI và ghi chú từ huấn luyện viên của bạn.</div></div></div>
-  <div class="panel ai-box"><div class="panel-title" style="margin-bottom:8px;">Tóm tắt AI</div>
-    <div class="ai-output">${summary.text}</div>
-    <div class="ai-disclaimer">⚠️ Tóm tắt do AI tạo tự động từ lịch sử điểm danh, chỉ mang tính tham khảo.</div></div>
+  <div class="topbar"><div><div class="page-eyebrow">Cổng Hội Viên</div><div class="page-title">Nhật Ký InBody &amp; Tiến Độ Thể Chất</div>
+    <div class="page-desc">Tổng hợp lịch sử check-in, đánh giá chuyên cần và nhận xét hướng dẫn từ huấn luyện viên cá nhân của bạn.</div></div></div>
+  <div class="panel" style="background:var(--surface);border:1px solid var(--line);"><div class="panel-title" style="margin-bottom:8px;color:var(--volt);">Đánh Giá Thể Chất &amp; Chuyên Cần</div>
+    <div class="ai-output" style="border-left:3px solid var(--volt);">${summary.text || 'Chưa có dữ liệu tiến độ.'}</div>
+    <div class="hint" style="margin-top:10px;color:var(--chalk-dim);">📊 Phân tích được tổng hợp dựa trên lịch sử điểm danh và giáo trình tập luyện thực tế của bạn tại phòng gym.</div></div>
   <div class="panel"><div class="panel-head"><div class="panel-title">Lịch sử tập luyện gần đây</div></div>
     ${attTop.length ? `<table><thead><tr><th>Ngày</th><th>Giờ vào</th><th>Giờ ra</th><th>Ghi chú</th></tr></thead>
     <tbody>${attTop.map(a => `<tr><td>${a.date}</td><td class="mono">${a.time}</td><td class="mono">${a.checkOutTime || '—'}</td><td>${a.note || '—'}</td></tr>`).join('')}</tbody></table>`

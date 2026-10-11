@@ -49,15 +49,14 @@ VIEWS.aiAssist = async function () {
   return `
     <div class="topbar">
       <div>
-        <div class="page-eyebrow">AI trợ lý</div>
+        <div class="page-eyebrow">Kế hoạch Huấn luyện</div>
 
         <div class="page-title">
-          Gợi ý lịch tập AI
+          Thiết lập Lịch tập Mẫu theo Mục tiêu
         </div>
 
         <div class="page-desc">
-          AI gợi ý lịch tập tham khảo dựa trên mục tiêu,
-          thời gian rảnh và mức độ hiện tại của hội viên.
+          Hệ thống hỗ trợ phân chia khung lịch tập luyện khoa học (Push-Pull-Legs, Upper-Lower, Fullbody) dựa trên mục tiêu thể hình, cấp độ và số ngày tập trong tuần.
         </div>
       </div>
     </div>
@@ -197,18 +196,12 @@ VIEWS.aiAssist = async function () {
         class="btn btn-primary"
         onclick="runAiSuggest()"
       >
-        Tạo gợi ý lịch tập
+        Tạo khung lịch tập mẫu
       </button>
 
 
-      <div class="ai-disclaimer">
-        ⚠️ Đây là gợi ý tham khảo do AI tạo ra dựa trên
-        dữ liệu bạn cung cấp,
-        <b>
-          không thay thế tư vấn y tế hoặc chuyên môn thể chất
-        </b>.
-        Vui lòng trao đổi với huấn luyện viên hoặc bác sĩ
-        trước khi bắt đầu chương trình tập mới.
+      <div class="ai-disclaimer" style="background: rgba(198, 255, 58, 0.08); border-color: rgba(198, 255, 58, 0.25); color: var(--chalk);">
+        💡 <b>Nguyên lý chuyên môn:</b> Khung lịch tập được xây dựng theo giáo trình thể hình chuẩn hóa. Huấn luyện viên và hội viên có thể tùy chỉnh bài tập, hiệp và mức tạ chi tiết trong phần <b>Giáo án tập luyện</b>.
       </div>
 
 
@@ -368,7 +361,7 @@ VIEWS.aiReminder = async function () {
                 class="icon-btn"
                 onclick="genReminder(${m.id})"
               >
-                Tạo tin nhắn AI
+                Tạo tin nhắn chăm sóc
               </button>
 
             </td>
@@ -386,16 +379,15 @@ VIEWS.aiReminder = async function () {
       <div>
 
         <div class="page-eyebrow">
-          AI trợ lý
+          Vận hành Câu lạc bộ
         </div>
 
         <div class="page-title">
-          Nhắc lịch / Gia hạn gói
+          Chăm sóc Hội viên &amp; Nhắc hạn Thẻ
         </div>
 
         <div class="page-desc">
-          AI sinh tin nhắn nhắc lịch tập hoặc gia hạn
-          gói tập, ưu tiên hội viên sắp/đã hết hạn.
+          Tự động rà soát hội viên sắp hoặc đã hết hạn thẻ tập để tạo tin nhắn chăm sóc khách hàng và nhắc gia hạn kịp thời.
         </div>
 
       </div>
@@ -405,7 +397,7 @@ VIEWS.aiReminder = async function () {
         class="btn btn-secondary"
         onclick="generateAllReminders()"
       >
-        Tạo tin nhắn cho tất cả hội viên cần gia hạn
+        Quét &amp; Tạo tin nhắn nhắc hạn tất cả
       </button>
 
     </div>
@@ -606,16 +598,15 @@ VIEWS.aiProgress = async function () {
       <div>
 
         <div class="page-eyebrow">
-          AI trợ lý
+          Theo dõi Thể lực
         </div>
 
         <div class="page-title">
-          Tóm tắt tiến độ tập luyện
+          Báo cáo Đánh giá Thể chất &amp; Tiến độ
         </div>
 
         <div class="page-desc">
-          AI tóm tắt tiến độ tập luyện của hội viên
-          dựa trên lịch sử điểm danh.
+          Tổng hợp lịch sử buổi tập, tần suất rèn luyện và nhận xét chuyên môn về sự tiến bộ thể chất của hội viên.
         </div>
 
       </div>
@@ -660,7 +651,7 @@ VIEWS.aiProgress = async function () {
               class="btn btn-primary"
               onclick="runProgress()"
             >
-              Tạo tóm tắt
+              Tạo báo cáo đánh giá
             </button>
 
           `
@@ -672,18 +663,16 @@ VIEWS.aiProgress = async function () {
                 runProgress(${SESSION.memberId})
               "
             >
-              Xem tóm tắt tiến độ của tôi
+              Xem báo cáo đánh giá của tôi
             </button>
 
           `
       }
 
 
-      <div class="ai-disclaimer">
+      <div class="ai-disclaimer" style="background: rgba(46, 213, 115, 0.08); border-color: rgba(46, 213, 115, 0.25); color: var(--chalk);">
 
-        ⚠️ Tóm tắt này do AI tạo tự động từ dữ liệu
-        điểm danh, chỉ mang tính tham khảo và không
-        thay thế đánh giá chuyên môn.
+        📊 Báo cáo được trích xuất trực tiếp từ lịch sử check-in và dữ liệu rèn luyện thực tế của hội viên tại FitCore.
 
       </div>
 
@@ -765,27 +754,27 @@ ${result.text || result.summary || 'Chưa có dữ liệu tiến độ.'}</div>
 VIEWS.aiChatBot = async function () {
   const FITCORE_SUGGESTIONS = [
     'Gói tập của tôi còn bao nhiêu ngày?',
-    'Lịch tập tiếp theo của tôi là khi nào?',
-    'Làm sao để gia hạn gói tập hoặc check-in?',
-    'Huấn luyện viên phụ trách của tôi là ai?'
+    'Lịch tập cá nhân tiếp theo của tôi là khi nào?',
+    'Quy trình đăng ký gia hạn thẻ tập FitCore?',
+    'Làm thế nào để liên hệ huấn luyện viên PT?'
   ];
 
   const GENERAL_SUGGESTIONS = [
-    'Làm sao để duy trì thói quen tập khi bận rộn?',
-    'Gợi ý thực đơn ăn uống lành mạnh dễ nấu cho người đi làm?',
-    'Cho tôi vài lời khuyên giảm stress sau ngày làm việc mệt mỏi?',
-    'Giải thích hiện tượng đau nhức cơ sau khi tập (DOMS)?',
-    'Nên uống bao nhiêu nước mỗi ngày và cách phân bổ hợp lý?'
+    'Kỹ thuật hít thở chuẩn khi tập bài Compound (Squat/Deadlift)?',
+    'Thực đơn dinh dưỡng tăng cơ giảm mỡ cho người đi làm?',
+    'Cách khởi động làm ấm khớp đúng cách trước buổi tập nặng?',
+    'Hiện tượng đau nhức cơ sau tập (DOMS) và cách phục hồi?',
+    'Lượng nước và chất điện giải cần nạp trong buổi tập gym?'
   ];
 
   return `
     <div class="topbar">
       <div>
-        <div class="page-eyebrow">AI Trợ Lý Đa Năng</div>
-        <div class="page-title">Hỏi đáp AI Toàn diện</div>
+        <div class="page-eyebrow">Hỗ trợ Hội viên</div>
+        <div class="page-title">Bàn Tư vấn Thể hình &amp; Dinh dưỡng FitCore</div>
         <div class="page-desc">
-          Trợ lý thông minh hỗ trợ giải đáp mọi thông tin FitCore (gói tập, lịch tập, PT, check-in, thanh toán) 
-          <strong>và sẵn sàng trò chuyện, trả lời bất kỳ câu hỏi đời sống, khoa học, kiến thức ngoài lề nào</strong> cùng bạn.
+          Kênh giải đáp trực tiếp thông tin câu lạc bộ (thẻ tập, lịch PT, check-in, thanh toán) 
+          và tư vấn kỹ thuật luyện tập, dinh dưỡng phục hồi thể hình chuyên sâu.
         </div>
       </div>
     </div>
@@ -900,11 +889,10 @@ async function renderAiChat() {
     if (!Array.isArray(thread) || !thread.length) {
       el.innerHTML = `
         <div class="empty-state" style="padding: 30px 10px;">
-          <div style="font-size: 26px; margin-bottom: 8px;">👋</div>
-          <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Chào bạn! Mình là FitCore AI Assistant.</div>
+          <div style="font-size: 26px; margin-bottom: 8px;">🏋️</div>
+          <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Chào bạn! Mình là Tư vấn viên Thể hình FitCore.</div>
           <div style="color: var(--muted); font-size: 13px; max-width: 480px; margin: 0 auto;">
-            Hãy chọn một câu hỏi gợi ý phía dưới hoặc nhập bất kỳ câu hỏi nào bạn muốn hỏi — 
-            từ gói tập, check-in tại FitCore cho đến các chủ đề khoa học, học tập, đời sống ngoài lề!
+            Bạn có thể chọn nhanh các câu hỏi phía dưới hoặc gửi bất kỳ thắc mắc nào về gói tập, lịch hẹn PT, dinh dưỡng và kỹ thuật bài tập gym.
           </div>
         </div>
       `;
@@ -918,7 +906,7 @@ async function renderAiChat() {
           return `
             <div style="align-self: ${isUser ? 'flex-end' : 'flex-start'}; max-width: 82%;">
               <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: ${isUser ? 'right' : 'left'};">
-                ${isUser ? 'Bạn' : '🤖 FitCore AI'}
+                ${isUser ? 'Bạn' : '🏋️ Tư vấn viên FitCore'}
               </div>
               <div
                 class="chat-bubble"

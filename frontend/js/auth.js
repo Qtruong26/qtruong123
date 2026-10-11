@@ -71,6 +71,17 @@ async function doLogin(event) {
     Auth.clearSession();
 
     const data = await Api.post('/auth/login', { username, password });
+
+    // Lưu trạng thái Ghi nhớ đăng nhập
+    const remEl = document.getElementById('rememberMe');
+    if (remEl && remEl.checked) {
+      localStorage.setItem('fitcore_remember_user', username);
+      localStorage.setItem('fitcore_remember_me', 'true');
+    } else {
+      localStorage.removeItem('fitcore_remember_user');
+      localStorage.removeItem('fitcore_remember_me');
+    }
+
     Auth.setSession(data.token, data.user);
     enterApp(data.user);
   } catch (err) {
@@ -139,7 +150,7 @@ function togglePasswordVisibility(inputId, icon) {
   if (!input) return;
   if (input.type === 'password') {
     input.type = 'text';
-    if (icon) icon.style.color = '#a3e635';
+    if (icon) icon.style.color = '#FF5500';
   } else {
     input.type = 'password';
     if (icon) icon.style.color = '#64748b';
@@ -244,4 +255,26 @@ async function restoreSession() {
   } catch (err) {
     Auth.clearSession();
   }
+}
+
+// Khôi phục tên đăng nhập nếu người dùng đã tích "Ghi nhớ đăng nhập"
+function initRememberMe() {
+  try {
+    const isRemembered = localStorage.getItem('fitcore_remember_me') === 'true';
+    const savedUser = localStorage.getItem('fitcore_remember_user');
+    const remEl = document.getElementById('rememberMe');
+    const userEl = document.getElementById('login-username');
+    if (isRemembered && savedUser && userEl) {
+      userEl.value = savedUser;
+      if (remEl) remEl.checked = true;
+    }
+  } catch (e) {
+    console.warn('initRememberMe error:', e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRememberMe);
+} else {
+  initRememberMe();
 }

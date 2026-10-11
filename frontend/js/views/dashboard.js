@@ -79,129 +79,89 @@ VIEWS.dashboard = async function () {
   const html = `
 
   <div class="topbar">
-
     <div>
-
-      <div class="page-eyebrow">
-        Tổng quan
-      </div>
-
-      <div class="page-title">
-        Bảng điều khiển
-      </div>
-
+      <div class="page-eyebrow">Trung tâm Vận hành FitCore</div>
+      <div class="page-title">Bảng điều khiển Quản trị</div>
       <div class="page-desc">
-        Theo dõi hội viên, tỷ lệ duy trì
-        và doanh thu trung tâm theo thời gian thực.
+        Kiểm soát lưu lượng hội viên, tỷ lệ gia hạn thẻ và doanh thu toàn câu lạc bộ theo thời gian thực.
       </div>
-
     </div>
 
+    <div class="toolbar" style="gap:10px;">
+      <button class="btn btn-primary" onclick="editMember(null)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm hội viên
+      </button>
+      <button class="btn btn-secondary" onclick="openCheckinModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        Check-in
+      </button>
+      <button class="btn btn-secondary" onclick="navigate('packages')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Gói tập &amp; Thu
+      </button>
+      <button class="btn btn-secondary" onclick="openScheduleModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Lịch hẹn
+      </button>
+    </div>
   </div>
 
-
   <!-- =====================================
-       THỐNG KÊ
+       THỐNG KÊ HOẠT ĐỘNG PHÒNG GYM
   ====================================== -->
-
-  <div
-    class="grid grid-4"
-    style="margin-bottom:20px;"
-  >
-
+  <div class="grid grid-4" style="margin-bottom:22px;">
     <div class="stat-tile">
-
-      <div
-        class="bar"
-        style="background:var(--volt);"
-      ></div>
-
-      <div class="stat-label">
-        Tổng hội viên
+      <div class="bar" style="background:var(--volt);"></div>
+      <div class="stat-tile-top">
+        <div class="stat-label">Tổng hội viên</div>
+        <div class="stat-icon" style="color:var(--volt);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
       </div>
-
-      <div class="stat-value">
-        ${s.total}
-      </div>
-
+      <div class="stat-value">${s.total}</div>
       <div class="stat-sub">
-        +${s.newThisMonth}
-        mới trong 30 ngày
+        <span class="stat-delta up">+${s.newThisMonth}</span> hội viên mới trong 30 ngày
       </div>
-
     </div>
 
-
     <div class="stat-tile">
-
-      <div
-        class="bar"
-        style="background:var(--steel);"
-      ></div>
-
-      <div class="stat-label">
-        Tỷ lệ duy trì
+      <div class="bar" style="background:var(--steel);"></div>
+      <div class="stat-tile-top">
+        <div class="stat-label">Tỷ lệ duy trì thẻ</div>
+        <div class="stat-icon" style="color:var(--steel);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
       </div>
-
-      <div class="stat-value">
-        ${s.retention}%
-      </div>
-
-      <div class="stat-sub">
-        Hội viên còn gói hiệu lực
-      </div>
-
+      <div class="stat-value">${s.retention}%</div>
+      <div class="stat-sub">Hội viên còn gói tập hiệu lực</div>
     </div>
 
-
     <div class="stat-tile">
-
-      <div
-        class="bar"
-        style="background:var(--amber);"
-      ></div>
-
-      <div class="stat-label">
-        Sắp hết hạn (≤7 ngày)
+      <div class="bar" style="background:var(--amber);"></div>
+      <div class="stat-tile-top">
+        <div class="stat-label">Cần gia hạn (≤7 ngày)</div>
+        <div class="stat-icon" style="color:var(--amber);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
       </div>
-
-      <div class="stat-value">
-        ${s.expiringSoon}
-      </div>
-
+      <div class="stat-value">${s.expiringSoon}</div>
       <div class="stat-sub">
-        ${s.expired}
-        đã hết hạn — cần gia hạn
+        <span class="stat-delta down">${s.expired}</span> thẻ đã hết hạn
       </div>
-
     </div>
 
-
     <div class="stat-tile">
-
-      <div
-        class="bar"
-        style="background:var(--signal);"
-      ></div>
-
-      <div class="stat-label">
-        Doanh thu tháng này
+      <div class="bar" style="background:var(--signal);"></div>
+      <div class="stat-tile-top">
+        <div class="stat-label">Doanh thu tháng này</div>
+        <div class="stat-icon" style="color:var(--signal);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
       </div>
-
-      <div
-        class="stat-value"
-        style="font-size:20px;"
-      >
-        ${fmtMoney(s.revenueMonth)}
-      </div>
-
-      <div class="stat-sub">
-        Tổng cộng:
-        ${fmtMoney(s.revenueTotal)}
-      </div>
-
+      <div class="stat-value" style="font-size:22px;">${fmtMoney(s.revenueMonth)}</div>
+      <div class="stat-sub">Tổng tích lũy: ${fmtMoney(s.revenueTotal)}</div>
     </div>
-
   </div>
 
 

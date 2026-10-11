@@ -236,8 +236,8 @@ VIEWS.progressTracking = async function () {
   const students = await Api.get('/progress/students');
   return `
   <div class="topbar">
-    <div><div class="page-eyebrow">Công việc PT</div><div class="page-title">Theo dõi tiến độ</div>
-    <div class="page-desc">Xem lịch sử điểm danh, tóm tắt AI và ghi chú tiến độ của từng học viên.</div></div>
+    <div><div class="page-eyebrow">Huấn luyện &amp; Chuyên môn PT</div><div class="page-title">Theo dõi Chỉ số &amp; Tiến độ Học viên</div>
+    <div class="page-desc">Theo dõi tần suất check-in, đánh giá thể lực và lưu nhật ký huấn luyện của từng học viên phụ trách.</div></div>
   </div>
   <div class="panel"><div class="field mb-0"><label>Chọn học viên</label>
     <select id="pt_member" onchange="openStudentProgress(Number(this.value))">
@@ -258,8 +258,11 @@ async function openStudentProgress(memberId) {
     ]);
     const attTop = attendance.slice(0, 10);
     document.getElementById('pt_output').innerHTML = `
-      <div class="panel ai-box"><div class="panel-title" style="margin-bottom:8px;">Tóm tắt AI — ${member.name}</div>
-        <div class="ai-output">${summary.text}</div></div>
+      <div class="panel" style="background:var(--surface);border:1px solid var(--line);">
+        <div class="panel-title" style="margin-bottom:8px;color:var(--volt);">Đánh giá Chuyên cần &amp; Thể chất — ${member.name}</div>
+        <div class="ai-output" style="border-left:3px solid var(--volt);">${summary.text || 'Chưa có dữ liệu tiến độ.'}</div>
+        <div class="hint" style="margin-top:8px;">📊 Báo cáo tự động tổng hợp từ lịch sử check-in và kế hoạch rèn luyện thực tế.</div>
+      </div>
       <div class="panel"><div class="panel-head"><div class="panel-title">Lịch sử điểm danh gần đây</div></div>
         ${attTop.length ? `<table><thead><tr><th>Ngày</th><th>Giờ</th><th>Ghi chú</th></tr></thead>
         <tbody>${attTop.map(a => `<tr><td>${a.date}</td><td>${a.time}</td><td>${a.note || '—'}</td></tr>`).join('')}</tbody></table>`

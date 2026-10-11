@@ -7,14 +7,37 @@ VIEWS.trainers = async function () {
       ${canDelete ? `<button class="icon-btn danger" onclick="deleteTrainer(${t.id})">Xóa</button>` : ''}</td></tr>`).join('');
   return `
   <div class="topbar">
-    <div><div class="page-eyebrow">Vận hành</div><div class="page-title">Huấn luyện viên</div>
-    <div class="page-desc">Xem và cập nhật hồ sơ, lịch làm việc của huấn luyện viên.</div></div>
-    ${canDelete ? `<button class="btn btn-primary" onclick="editTrainer(null)">+ Thêm HLV</button>` : ''}
+    <div>
+      <div class="page-eyebrow">Đội ngũ Chuyên môn</div>
+      <div class="page-title">Huấn luyện viên Thể hình (PT)</div>
+      <div class="page-desc">Quản lý đội ngũ Personal Trainer (PT), chuyên môn huấn luyện và lịch trực huấn luyện tại trung tâm.</div>
+    </div>
+    ${canDelete ? `
+      <button class="btn btn-primary" onclick="editTrainer(null)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        + Thêm HLV
+      </button>` : ''}
   </div>
-  <div class="panel"><div class="table-wrap">
-    <table><thead><tr><th>Họ tên</th><th>SĐT</th><th>Chuyên môn</th><th>Ngày làm việc</th><th></th></tr></thead>
-    <tbody>${rows || `<tr><td colspan="5"><div class="empty-state">Chưa có huấn luyện viên nào.</div></td></tr>`}</tbody></table>
-  </div></div>`;
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">Danh sách Huấn luyện viên</div>
+      <div class="hint">${trainers.length} nhân sự PT</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Họ tên</th>
+            <th>SĐT</th>
+            <th>Chuyên môn huấn luyện</th>
+            <th>Lịch trực trong tuần</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${rows || `<tr><td colspan="5"><div class="empty-state">Chưa có huấn luyện viên nào.</div></td></tr>`}</tbody>
+      </table>
+    </div>
+  </div>`;
 };
 
 async function editTrainer(id) {

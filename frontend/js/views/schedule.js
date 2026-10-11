@@ -13,14 +13,38 @@ VIEWS.schedule = async function () {
 
   return `
   <div class="topbar">
-    <div><div class="page-eyebrow">Vận hành</div><div class="page-title">Lịch tập</div>
-    <div class="page-desc">Đăng ký lịch tập cá nhân/nhóm với huấn luyện viên.${SESSION.role === 'admin' ? ' Quản lý có toàn quyền thêm và hủy mọi lịch tập.' : ''}</div></div>
-    <button class="btn btn-primary" onclick="openScheduleModal()">+ Đặt lịch</button>
+    <div>
+      <div class="page-eyebrow">Lịch Trình Huấn Luyện</div>
+      <div class="page-title">Lịch Tập Cá Nhân (PT 1:1) &amp; Lớp Học Nhóm</div>
+      <div class="page-desc">Điều phối lịch hẹn tập luyện 1:1 cùng huấn luyện viên và các lớp đào tạo thể hình nhóm tại trung tâm.</div>
+    </div>
+    <button class="btn btn-primary" onclick="openScheduleModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      + Đặt lịch tập
+    </button>
   </div>
-  <div class="panel"><div class="table-wrap">
-    <table><thead><tr><th>Ngày</th><th>Giờ</th><th>Hội viên / Lớp</th><th>HLV</th><th>Loại</th><th>Trạng thái</th><th></th></tr></thead>
-    <tbody>${rows || `<tr><td colspan="7"><div class="empty-state">Chưa có lịch tập nào.</div></td></tr>`}</tbody></table>
-  </div></div>`;
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">Danh sách Buổi tập &amp; Lớp học</div>
+      <div class="hint">${list.length} lịch hẹn</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ngày</th>
+            <th>Giờ tập</th>
+            <th>Hội viên / Lớp nhóm</th>
+            <th>Huấn luyện viên phụ trách</th>
+            <th>Hình thức</th>
+            <th>Trạng thái</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${rows || `<tr><td colspan="7"><div class="empty-state">Chưa có lịch tập nào.</div></td></tr>`}</tbody>
+      </table>
+    </div>
+  </div>`;
 };
 
 async function openScheduleModal() {
