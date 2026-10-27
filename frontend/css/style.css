@@ -251,7 +251,6 @@ input,
 .form-row input,
 .panel input,
 .modal input,
-.auth-box input,
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]):not([type="color"]),
 input[type="text"],
 input[type="number"],
@@ -1289,18 +1288,45 @@ textarea:disabled {
 .auth-box input[type="password"],
 .auth-box input[type="email"],
 .auth-box input[type="tel"],
+.auth-box input,
 .auth-box .auth-select {
   width: 100%;
   box-sizing: border-box;
   background: #0e121b !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 10px;
-  padding: 11px 14px 11px 42px !important;
+  padding: 11px 14px 11px 14px !important;
   font-size: 14px;
   color: #ffffff !important;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+/* Đảm bảo toàn bộ input/select có icon bên trái có padding-left 46px để không bao giờ bị đè chữ */
+.input-icon-wrapper input,
+.input-icon-wrapper select,
+.input-icon-wrapper .auth-select,
+.auth-box .input-icon-wrapper input,
+.auth-box .input-icon-wrapper select,
+.auth-box .input-icon-wrapper input[type="text"],
+.auth-box .input-icon-wrapper input[type="password"],
+.auth-box .input-icon-wrapper input[type="tel"],
+.auth-box .input-icon-wrapper input[type="email"],
+.auth-box .input-icon-wrapper .auth-select,
+.auth-box .input-icon-wrapper input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]):not([type="color"]) {
+  padding-left: 46px !important;
+  padding-right: 14px !important;
+}
+
+/* Các input có nút con mắt ẩn/hiện mật khẩu ở góc phải */
+.input-icon-wrapper.input-password-wrapper input,
+.auth-box .input-icon-wrapper.input-password-wrapper input,
+.auth-box .input-icon-wrapper.input-password-wrapper input[type="password"],
+.auth-box .input-icon-wrapper.input-password-wrapper input[type="text"],
+.auth-box .input-icon-wrapper.input-password-wrapper input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]):not([type="color"]) {
+  padding-left: 46px !important;
+  padding-right: 44px !important;
 }
 
 .auth-box input:focus,
