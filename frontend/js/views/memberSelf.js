@@ -5,10 +5,10 @@ VIEWS.myProfile = async function () {
   <div class="topbar"><div><div class="page-eyebrow">Tài khoản của tôi</div><div class="page-title">Thông tin cá nhân</div>
     <div class="page-desc">Xem và cập nhật thông tin liên hệ, mục tiêu tập luyện của bạn.</div></div></div>
   <div class="panel" style="max-width:520px;">
-    <div class="field"><label>Họ tên</label><input id="mp_name" value="${m.name}"></div>
+    <div class="field"><label>Họ tên</label><input type="text" id="mp_name" value="${m.name}" placeholder="Nhập họ và tên..."></div>
     <div class="form-row">
-      <div class="field"><label>Số điện thoại</label><input id="mp_phone" value="${m.phone || ''}"></div>
-      <div class="field"><label>Email</label><input id="mp_email" value="${m.email || ''}"></div>
+      <div class="field"><label>Số điện thoại</label><input type="tel" id="mp_phone" value="${m.phone || ''}" placeholder="09xxxxxxxx"></div>
+      <div class="field"><label>Email</label><input type="email" id="mp_email" value="${m.email || ''}" placeholder="name@example.com"></div>
     </div>
     <div class="form-row">
       <div class="field"><label>Mục tiêu tập luyện</label>

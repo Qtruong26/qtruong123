@@ -81,13 +81,13 @@ async function askGemini(prompt, options = {}) {
     throw new Error('Chưa cấu hình GEMINI_API_KEY trên server.');
   }
 
-  const primaryModel = options.model || process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const primaryModel = options.model || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const candidateModels = [
     primaryModel,
-    'gemini-3.5-flash',
-    'gemini-flash-latest',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
     'gemini-3.8-flash',
-    'gemini-3.7-flash'
+    'gemini-3.5-flash'
   ];
   const uniqueModels = [...new Set(candidateModels.filter(Boolean))];
 
@@ -113,6 +113,7 @@ Quy tắc:
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(10000),
           body: JSON.stringify({
             systemInstruction: {
               parts: [{ text: systemInstruction }]

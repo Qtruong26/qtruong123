@@ -9,126 +9,430 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261011_v11_golden_ratio_split">
+  <link rel="stylesheet" href="css/style.css?v=20261021_fix_inputs">
 </head>
 <body>
 
-<!-- ===================== LOGIN / REGISTER ===================== -->
-<div id="loginScreen">
-  <!-- Khung minh họa bên trái với ảnh Gym hiện đại đẳng cấp -->
-  <div class="login-illustration">
-    <img 
-      src="img/gym-bg.jpg" 
-      alt="FitCore Pro Fitness Platform" 
-      class="illu-image"
-    />
-    <div class="illu-content">
-      <div class="illu-eyebrow">FITCORE PRO · CLUB MANAGEMENT</div>
-      <div class="illu-title">TRUNG TÂM THỂ HÌNH<br>VẬN HÀNH CHUYÊN NGHIỆP</div>
-      <div class="illu-desc">Hệ thống quản lý hội viên toàn diện, kiểm soát ra vào một chạm, điều phối huấn luyện viên và theo dõi doanh thu phòng tập.</div>
-      <div class="illu-stats">
-        <div class="illu-stat"><div class="illu-stat-num">5.000+</div><div class="illu-stat-label">Hội viên tin chọn</div></div>
-        <div class="illu-stat"><div class="illu-stat-num">1 CHẠM</div><div class="illu-stat-label">Check-in tốc độ</div></div>
-        <div class="illu-stat"><div class="illu-stat-num">24/7</div><div class="illu-stat-label">Vận hành liên tục</div></div>
+<!-- ===================== LOGIN / REGISTER: CHUẨN PHÒNG GYM THƯƠNG MẠI ===================== -->
+<div id="loginScreen" class="gym-theme">
+  <!-- TOPBAR CLB GYM THỂ THAO CAO CẤP -->
+  <header class="gym-topbar">
+    <div class="gym-topbar-left">
+      <div class="gym-logo-badge">
+        <span class="gym-logo-symbol">FC</span>
+        <div class="gym-logo-glow"></div>
+      </div>
+      <div class="gym-brand-titles">
+        <div class="gym-brand-name">FITCORE ATHLETICS</div>
+        <div class="gym-brand-sub">HARDCORE GYM & FITNESS CLUB · EST. 2020</div>
+      </div>
+    </div>
+
+    <div class="gym-topbar-center">
+      <div class="gym-live-status">
+        <span class="live-dot"></span>
+        <span class="live-text">18/18 CLB ĐANG MỞ CỬA · 05:30 - 22:30</span>
+      </div>
+    </div>
+
+    <div class="gym-topbar-right">
+      <a href="tel:19006868" class="gym-topbar-item" title="Tổng đài CSKH">
+        <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Hotline: <strong>1900 6868</strong></span>
+      </a>
+      <button type="button" class="gym-trial-btn" onclick="openGymModal('gymTrialModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="btn-icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>TẬP THỬ 7 NGÀY VIP</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- KHUNG TRỤC CHÍNH BỐ CỤC ĐÔI CÂN XỨNG -->
+  <div class="gym-main-wrapper">
+    <!-- KHUNG TRÁI: SHOWCASE KHÔNG GIAN THỂ THAO ĐẲNG CẤP -->
+    <div class="login-illustration gym-showcase-box">
+      <img 
+        src="img/gym-bg.jpg" 
+        alt="FitCore Hardcore Athletics" 
+        class="illu-image"
+      />
+      <div class="illu-overlay-grid"></div>
+      
+      <div class="illu-content">
+        <div class="gym-badge-row">
+          <span class="gym-pill-badge">
+            <span class="pulse-icon">🔥</span> BEAST MODE ACTIVATED
+          </span>
+          <span class="gym-pill-badge outline">
+            CHUẨN QUỐC TẾ NASM / ACE
+          </span>
+        </div>
+
+        <h1 class="gym-hero-title">
+          ĐÁNH THỨC BẢN LĨNH<br>
+          <span class="gym-gradient-text">BỨC PHÁ MỌI GIỚI HẠN</span>
+        </h1>
+
+        <p class="gym-hero-desc">
+          Tổ hợp thể hình và huấn luyện thể chất chuyên nghiệp. Trang bị dàn tạ tự do chuẩn Olympic, máy khối cơ sinh học cao cấp và công nghệ check-in một chạm hiện đại.
+        </p>
+
+        <!-- 4 TIỆN ÍCH PHÒNG TẬP NỔI BẬT -->
+        <div class="gym-features-grid">
+          <div class="gym-feature-item">
+            <div class="feat-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+            </div>
+            <div class="feat-info">
+              <div class="feat-name">DÀN TẠ OLYMPIC & HALF-RACK</div>
+              <div class="feat-sub">Dumbbell 2.5kg - 60kg, đòn tạ Eleiko</div>
+            </div>
+          </div>
+
+          <div class="gym-feature-item">
+            <div class="feat-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="feat-info">
+              <div class="feat-name">MÁY HAMMER STRENGTH</div>
+              <div class="feat-sub">100% nhập khẩu từ Mỹ, chuẩn cơ sinh học</div>
+            </div>
+          </div>
+
+          <div class="gym-feature-item">
+            <div class="feat-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="feat-info">
+              <div class="feat-name">STUDIO BOXING & CROSSFIT</div>
+              <div class="feat-sub">Đấu đài đối kháng, bao cát & khu HIIT</div>
+            </div>
+          </div>
+
+          <div class="gym-feature-item">
+            <div class="feat-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="feat-info">
+              <div class="feat-name">XÔNG HƠI & PHỤC HỒI 5 SAO</div>
+              <div class="feat-sub">Sauna đá muối Himalaya, bồn ngâm đá Ice Bath</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THÔNG SỐ KHÂU VẬN HÀNH CLB -->
+        <div class="illu-stats">
+          <div class="illu-stat">
+            <div class="illu-stat-num">15.000+</div>
+            <div class="illu-stat-label">Hội viên năng động</div>
+          </div>
+          <div class="illu-stat">
+            <div class="illu-stat-num">85+</div>
+            <div class="illu-stat-label">Dòng máy chuyên sâu</div>
+          </div>
+          <div class="illu-stat">
+            <div class="illu-stat-num">100%</div>
+            <div class="illu-stat-label">HLV chuẩn quốc tế</div>
+          </div>
+        </div>
+
+        <!-- MOTIVATION TICKER -->
+        <div class="gym-quote-box">
+          <span class="quote-symbol">“</span>
+          <span class="quote-text">Giọt mồ hôi hôm nay là thành quả tự hào của ngày mai. No pain, no gain!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG PHẢI: FORM ĐĂNG NHẬP & ĐĂNG KÝ HỘI VIÊN -->
+    <div class="auth-box gym-auth-card">
+      <div class="card-glow-bar"></div>
+
+      <!-- CARD HEADER: THƯƠNG HIỆU CỔNG THÀNH VIÊN -->
+      <div class="auth-brand">
+        <div class="brand-badge">FC</div>
+        <div class="brand-info">
+          <h2>FITCORE ATHLETICS</h2>
+          <div class="brand-tagline">CỔNG HỘI VIÊN & QUẢN TRỊ VIÊN</div>
+        </div>
+      </div>
+
+      <!-- TAB CHUYỂN ĐĂNG NHẬP / ĐĂNG KÝ -->
+      <div class="tab-switcher">
+        <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span>ĐĂNG NHẬP</span>
+        </button>
+        <button type="button" class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          <span>ĐĂNG KÝ THÀNH VIÊN</span>
+        </button>
+      </div>
+
+      <div id="loginError" class="error-msg" style="display: none;"></div>
+      <div id="regError" class="error-msg" style="display: none;"></div>
+
+      <div class="auth-forms-container">
+        <!-- FORM 1: ĐĂNG NHẬP -->
+        <form id="form-login" class="auth-form active" onsubmit="doLogin(event)">
+          <div class="form-group">
+            <label for="login-username">TÊN ĐĂNG NHẬP HOẶC SỐ ĐIỆN THOẠI</label>
+            <div class="input-icon-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" id="login-username" placeholder="Nhập tên đăng nhập hoặc số điện thoại" required autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="login-password">MẬT KHẨU BẢO MẬT</label>
+            </div>
+            <div class="input-icon-wrapper input-password-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="login-password" placeholder="Nhập mật khẩu" required autocomplete="current-password" />
+              <button type="button" class="toggle-eye-btn" onclick="togglePasswordVisibility('login-password', this)" title="Ẩn/Hiện mật khẩu">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="remember-me" for="rememberMe">
+              <input type="checkbox" id="rememberMe" checked />
+              <span class="custom-check-box"></span>
+              <span>Ghi nhớ đăng nhập</span>
+            </label>
+            <a href="#" class="forgot-pass" onclick="openGymModal('gymForgotModal'); return false;">Quên mật khẩu?</a>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>VÀO PHÒNG TẬP NGAY</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+
+          <!-- TÍNH NĂNG MÔ PHỎNG CHECK-IN QR HỘI VIÊN -->
+          <div class="auth-divider">
+            <span>HOẶC TIỆN ÍCH HỘI VIÊN</span>
+          </div>
+
+          <button type="button" class="btn-qr-checkin" onclick="openGymModal('gymQrModal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="qr-btn-icon"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>QUÉT MÃ QR CHECK-IN CỬA TỰ ĐỘNG</span>
+          </button>
+        </form>
+
+        <!-- FORM 2: ĐĂNG KÝ -->
+        <form id="form-register" class="auth-form" onsubmit="doRegister(event)">
+          <div class="form-group">
+            <label for="regRole">VAI TRÒ TÀI KHOẢN TẠI CLB</label>
+            <div class="input-icon-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <select id="regRole" class="auth-select">
+                <option value="member">Hội viên (Tập luyện & Theo dõi PT)</option>
+                <option value="trainer">Huấn luyện viên cá nhân (PT)</option>
+                <option value="reception">Nhân viên Lễ tân (Quản lý ra vào)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-username">TÊN ĐĂNG NHẬP (USERNAME)</label>
+            <div class="input-icon-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+              </span>
+              <input type="text" id="reg-username" placeholder="vd: duc_gymmer, member99" required autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-name">HỌ VÀ TÊN</label>
+            <div class="input-icon-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" id="reg-name" placeholder="vd: Nguyễn Văn Minh" required autocomplete="name" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-phone">SỐ ĐIỆN THOẠI LIÊN HỆ</label>
+            <div class="input-icon-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </span>
+              <input type="tel" id="reg-phone" placeholder="vd: 0912345678" required autocomplete="tel" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-password">MẬT KHẨU (TỐI THIỂU 6 KÝ TỰ)</label>
+            <div class="input-icon-wrapper input-password-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="reg-password" placeholder="Mật khẩu bảo mật" required autocomplete="new-password" />
+              <button type="button" class="toggle-eye-btn" onclick="togglePasswordVisibility('reg-password', this)" title="Ẩn/Hiện mật khẩu">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-confirm-password">XÁC NHẬN MẬT KHẨU</label>
+            <div class="input-icon-wrapper input-password-wrapper">
+              <span class="input-left-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </span>
+              <input type="password" id="reg-confirm-password" placeholder="Nhập lại mật khẩu" required autocomplete="new-password" />
+              <button type="button" class="toggle-eye-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)" title="Ẩn/Hiện mật khẩu">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>HOÀN TẤT ĐĂNG KÝ HỘI VIÊN</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="arrow-icon"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- CARD FOOTER: SECURITY & TRUST -->
+      <div class="auth-card-footer">
+        <div class="security-seal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sec-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Mã hóa SSL 256-Bit · Bảo mật dữ liệu chuẩn ISO 27001</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Khung Form Đăng nhập / Đăng ký -->
-  <div class="auth-box">
-    <div class="auth-brand">
-      <div class="brand-badge">FC</div>
-      <div class="brand-info">
-        <h2>FITCORE PRO</h2>
-        <div class="brand-tagline">CLUB MANAGEMENT</div>
-      </div>
+  <!-- GYM LOGIN FOOTER BAR -->
+  <footer class="gym-bottom-bar">
+    <div class="bottom-brand">© 2026 FITCORE ATHLETICS & FITNESS INTERNATIONAL. All rights reserved.</div>
+    <div class="bottom-links">
+      <span>Quy định hội viên</span>
+      <span>Chính sách bảo mật</span>
+      <span>Hệ thống 18 CLB</span>
+      <span>Tuyển dụng HLV</span>
     </div>
-    
-    <div class="auth-title-wrap">
-      <h3 class="auth-heading">Đăng nhập hệ thống</h3>
-      <p class="auth-subtitle">Sử dụng tài khoản được cấp để tiếp tục.</p>
+  </footer>
+</div>
+
+<!-- ===================== CÁC MODAL TIỆN ÍCH PHÒNG GYM ===================== -->
+<!-- 1. Modal Quét mã QR Check-in Hội viên -->
+<div id="gymQrModal" class="gym-modal-backdrop" style="display:none;" onclick="if(event.target === this) closeGymModal('gymQrModal')">
+  <div class="gym-modal-box">
+    <button type="button" class="gym-modal-close" onclick="closeGymModal('gymQrModal')">&times;</button>
+    <div class="gym-modal-header">
+      <div class="gym-modal-tag">FITCORE ACCESS CONTROL</div>
+      <h3 class="gym-modal-title">CỔNG QUÉT QR CHECK-IN CỬA TỰ ĐỘNG</h3>
+      <p class="gym-modal-sub">Đặt mã QR trên Thẻ hội viên hoặc Ứng dụng điện thoại trước camera để mở cổng vào phòng tập.</p>
     </div>
 
-    <div class="tab-switcher">
-      <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
-      <button type="button" class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">Đăng ký tài khoản</button>
-    </div>
-
-    <div id="loginError" class="error-msg" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;"></div>
-    <div id="regError" class="error-msg" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;"></div>
-
-    <!-- Form 1: ĐĂNG NHẬP -->
-    <form id="form-login" class="auth-form active" onsubmit="doLogin(event)">
-      <div class="form-group">
-        <label>TÊN ĐĂNG NHẬP</label>
-        <input type="text" id="login-username" placeholder="admin" required />
-      </div>
-
-      <div class="form-group">
-        <label>MẬT KHẨU</label>
-        <div class="input-password-wrapper">
-          <input type="password" id="login-password" placeholder="Nhập mật khẩu" required />
-          <span class="toggle-eye" onclick="togglePasswordVisibility('login-password', this)">👁</span>
+    <div class="qr-scanner-viewfinder">
+      <div class="scanner-frame">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+        <div class="laser-scanner-line"></div>
+        <div class="scanner-icon-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
       </div>
+      <div class="scanner-status">Đang tìm tín hiệu mã QR thẻ hội viên...</div>
+    </div>
 
-      <div class="form-options">
-        <label class="remember-me" for="rememberMe">
-          <input type="checkbox" id="rememberMe" checked />
-          <span>Ghi nhớ đăng nhập</span>
-        </label>
-        <a href="#" class="forgot-pass" onclick="alert('Vui lòng liên hệ quản lý phòng gym để được cấp lại mật khẩu.'); return false;">Quên mật khẩu?</a>
-      </div>
+    <div class="qr-modal-actions">
+      <button type="button" class="btn btn-primary btn-block" onclick="simulateQrScan()">
+        ⚡ MÔ PHỎNG CHECK-IN HỘI VIÊN (PHẠM HỘI VIÊN)
+      </button>
+      <button type="button" class="btn btn-secondary btn-block" onclick="closeGymModal('gymQrModal')">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
 
-      <button type="submit" class="submit-btn">ĐĂNG NHẬP HỆ THỐNG →</button>
-      
-      <div class="auth-footer-note">© 2026 FitCore Pro. Hệ thống quản lý phòng tập chuyên nghiệp.</div>
-    </form>
+<!-- 2. Modal Đặt lịch Tập Thử 7 Ngày Miễn Phí -->
+<div id="gymTrialModal" class="gym-modal-backdrop" style="display:none;" onclick="if(event.target === this) closeGymModal('gymTrialModal')">
+  <div class="gym-modal-box">
+    <button type="button" class="gym-modal-close" onclick="closeGymModal('gymTrialModal')">&times;</button>
+    <div class="gym-modal-header">
+      <div class="gym-modal-tag">SPECIAL INVITATION · FITCORE</div>
+      <h3 class="gym-modal-title">NHẬN VÉ TẬP THỬ 7 NGÀY VIP MIỄN PHÍ</h3>
+      <p class="gym-modal-sub">Trải nghiệm không giới hạn tất cả các khu vực tạ, lớp Yoga, Boxing và nhận 01 buổi đo phân tích chỉ số cơ mỡ InBody 770 cùng HLV chuyên nghiệp.</p>
+    </div>
 
-    <!-- Form 2: ĐĂNG KÝ -->
-    <form id="form-register" class="auth-form" onsubmit="doRegister(event)">
-      <div class="form-group">
-        <label>VAI TRÒ TÀI KHOẢN</label>
-        <select id="regRole" class="auth-select">
-          <option value="member">Hội viên (Tập luyện)</option>
-          <option value="trainer">Huấn luyện viên (PT)</option>
-          <option value="reception">Lễ tân</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>TÊN ĐĂNG NHẬP</label>
-        <input type="text" id="reg-username" placeholder="vd: user123 (dùng để đăng nhập)" required />
-      </div>
-
+    <form onsubmit="submitGymTrial(event)" class="gym-modal-form">
       <div class="form-group">
         <label>HỌ VÀ TÊN</label>
-        <input type="text" id="reg-name" placeholder="vd: Nguyễn Văn A" required />
+        <input type="text" id="trial-name" placeholder="vd: Trần Quốc Bảo" required />
       </div>
-
       <div class="form-group">
-        <label>SỐ ĐIỆN THOẠI</label>
-        <input type="tel" id="reg-phone" placeholder="vd: 0912345678" required />
+        <label>SỐ ĐIỆN THOẠI NHẬN MÃ VÉ TẬP THỬ (SMS)</label>
+        <input type="tel" id="trial-phone" placeholder="vd: 0987654321" required />
       </div>
-
       <div class="form-group">
-        <label>MẬT KHẨU</label>
-        <div class="input-password-wrapper">
-          <input type="password" id="reg-password" placeholder="Tối thiểu 6 ký tự" required />
-          <span class="toggle-eye" onclick="togglePasswordVisibility('reg-password', this)">👁</span>
-        </div>
+        <label>CHỌN CÂU LẠC BỘ GẦN BẠN NHẤT</label>
+        <select id="trial-club" class="auth-select">
+          <option value="q1">FitCore Flagship — Quận 1, TP. Hồ Chí Minh</option>
+          <option value="caugiay">FitCore Elite — Cầu Giấy, Hà Nội</option>
+          <option value="binhthanh">FitCore Athletics — Bình Thạnh, TP. Hồ Chí Minh</option>
+          <option value="danang">FitCore Coastal — Hải Châu, Đà Nẵng</option>
+        </select>
       </div>
-
-      <div class="form-group">
-        <label>XÁC NHẬN MẬT KHẨU</label>
-        <div class="input-password-wrapper">
-          <input type="password" id="reg-confirm-password" placeholder="Nhập lại mật khẩu" required />
-          <span class="toggle-eye" onclick="togglePasswordVisibility('reg-confirm-password', this)">👁</span>
-        </div>
-      </div>
-
-      <button type="submit" class="submit-btn">Tạo tài khoản</button>
+      <button type="submit" class="submit-btn" style="margin-top:16px;">
+        ĐĂNG KÝ NHẬN VÉ VIP NGAY
+      </button>
     </form>
+  </div>
+</div>
+
+<!-- 3. Modal Quên mật khẩu / Thất lạc thẻ -->
+<div id="gymForgotModal" class="gym-modal-backdrop" style="display:none;" onclick="if(event.target === this) closeGymModal('gymForgotModal')">
+  <div class="gym-modal-box">
+    <button type="button" class="gym-modal-close" onclick="closeGymModal('gymForgotModal')">&times;</button>
+    <div class="gym-modal-header">
+      <div class="gym-modal-tag">HỖ TRỢ TÀI KHOẢN HỘI VIÊN</div>
+      <h3 class="gym-modal-title">QUÊN MẬT KHẨU / CẤP LẠI THẺ</h3>
+      <p class="gym-modal-sub">Để đảm bảo an ninh phòng tập và quyền lợi hội viên, việc cấp lại mật khẩu được xác thực trực tiếp tại hệ thống.</p>
+    </div>
+
+    <div class="forgot-instructions">
+      <div class="instruct-item">
+        <div class="instruct-num">1</div>
+        <div class="instruct-body">
+          <strong>Tại quầy Lễ tân CLB:</strong> Xuất trình CCCD/CMND hoặc số điện thoại đăng ký gói tập để nhân viên Lễ tân cấp lại mã PIN hoặc thẻ mới trong 1 phút.
+        </div>
+      </div>
+      <div class="instruct-item">
+        <div class="instruct-num">2</div>
+        <div class="instruct-body">
+          <strong>Qua Tổng đài Hotline:</strong> Gọi <a href="tel:19006868" style="color:var(--volt);font-weight:700;">1900 6868</a> (nhánh 1) hoạt động từ 05:30 đến 22:30 hằng ngày để được hỗ trợ reset tài khoản.
+        </div>
+      </div>
+    </div>
+
+    <div class="qr-modal-actions" style="margin-top:20px;">
+      <a href="tel:19006868" class="btn btn-primary btn-block" style="text-decoration:none;">
+        📞 GỌI TỔNG ĐÀI 1900 6868
+      </a>
+      <button type="button" class="btn btn-secondary btn-block" onclick="closeGymModal('gymForgotModal')">
+        Đã hiểu & Đóng
+      </button>
+    </div>
   </div>
 </div>
 
@@ -180,25 +484,25 @@
 
 <!-- Lõi dùng chung (Core JS) -->
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="js/api.js?v=2"></script>
-<script src="js/ui.js?v=2"></script>
-<script src="js/auth.js?v=2"></script>
-<script src="js/router.js?v=2"></script>
+<script src="js/api.js?v=20261021_pro"></script>
+<script src="js/ui.js?v=20261021_pro"></script>
+<script src="js/auth.js?v=20261021_pro"></script>
+<script src="js/router.js?v=20261021_pro"></script>
 
 <!-- Các view theo domain -->
-<script src="js/views/dashboard.js?v=2"></script>
-<script src="js/views/members.js?v=2"></script>
-<script src="js/views/packages.js?v=2"></script>
-<script src="js/views/trainers.js?v=2"></script>
-<script src="js/views/schedule.js?v=2"></script>
-<script src="js/views/attendance.js?v=2"></script>
-<script src="js/views/reports.js?v=2"></script>
-<script src="js/views/ai.js?v=2"></script>
-<script src="js/views/pt.js?v=2"></script>
-<script src="js/views/memberSelf.js?v=2"></script>
-<script src="js/views/staff.js?v=2"></script>
+<script src="js/views/dashboard.js?v=20261021_pro"></script>
+<script src="js/views/members.js?v=20261021_pro"></script>
+<script src="js/views/packages.js?v=20261021_pro"></script>
+<script src="js/views/trainers.js?v=20261021_pro"></script>
+<script src="js/views/schedule.js?v=20261021_pro"></script>
+<script src="js/views/attendance.js?v=20261021_pro"></script>
+<script src="js/views/reports.js?v=20261021_pro"></script>
+<script src="js/views/ai.js?v=20261021_pro"></script>
+<script src="js/views/pt.js?v=20261021_pro"></script>
+<script src="js/views/memberSelf.js?v=20261021_pro"></script>
+<script src="js/views/staff.js?v=20261021_pro"></script>
 
-<script src="js/main.js?v=2"></script>
+<script src="js/main.js?v=20261021_pro"></script>
 <script>
   // Hàm mở/đóng menu trượt
   function toggleMobileNav() {

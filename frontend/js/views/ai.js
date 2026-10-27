@@ -201,7 +201,7 @@ VIEWS.aiAssist = async function () {
 
 
       <div class="ai-disclaimer" style="background: rgba(198, 255, 58, 0.08); border-color: rgba(198, 255, 58, 0.25); color: var(--chalk);">
-        💡 <b>Nguyên lý chuyên môn:</b> Khung lịch tập được xây dựng theo giáo trình thể hình chuẩn hóa. Huấn luyện viên và hội viên có thể tùy chỉnh bài tập, hiệp và mức tạ chi tiết trong phần <b>Giáo án tập luyện</b>.
+        <b>Nguyên lý chuyên môn:</b> Khung lịch tập được xây dựng theo giáo trình thể hình chuẩn hóa. Huấn luyện viên và hội viên có thể tùy chỉnh bài tập, hiệp và mức tạ chi tiết trong phần <b>Giáo án tập luyện</b>.
       </div>
 
 
@@ -305,7 +305,7 @@ async function runAiSuggest() {
       <div class="ai-output"><b>Lịch tập tham khảo — mục tiêu: ${goal} (mức độ: ${level})</b>${
       plan.length
         ? plan.map((p) => `<div style="margin-bottom:10px;"><span class="plan-day">${p.day || ''}</span>${p.focus || ''}${p.intensity ? ` — cường độ: ${p.intensity}` : ''}</div>`).join('')
-        : `<div class="empty-state">AI chưa tạo được lịch tập.</div>`
+        : `<div class="empty-state">Chưa tạo được lịch tập phù hợp.</div>`
     }</div>`;
 
 
@@ -522,7 +522,7 @@ async function generateAllReminders() {
 
           <div class="empty-state">
             Không có hội viên nào cần
-            nhắc gia hạn lúc này 🎉
+            nhắc gia hạn lúc này.
           </div>
 
         </div>
@@ -672,7 +672,7 @@ VIEWS.aiProgress = async function () {
 
       <div class="ai-disclaimer" style="background: rgba(46, 213, 115, 0.08); border-color: rgba(46, 213, 115, 0.25); color: var(--chalk);">
 
-        📊 Báo cáo được trích xuất trực tiếp từ lịch sử check-in và dữ liệu rèn luyện thực tế của hội viên tại FitCore.
+        Báo cáo được trích xuất trực tiếp từ lịch sử check-in và dữ liệu rèn luyện thực tế của hội viên tại FitCore.
 
       </div>
 
@@ -759,14 +759,6 @@ VIEWS.aiChatBot = async function () {
     'Làm thế nào để liên hệ huấn luyện viên PT?'
   ];
 
-  const GENERAL_SUGGESTIONS = [
-    'Kỹ thuật hít thở chuẩn khi tập bài Compound (Squat/Deadlift)?',
-    'Thực đơn dinh dưỡng tăng cơ giảm mỡ cho người đi làm?',
-    'Cách khởi động làm ấm khớp đúng cách trước buổi tập nặng?',
-    'Hiện tượng đau nhức cơ sau tập (DOMS) và cách phục hồi?',
-    'Lượng nước và chất điện giải cần nạp trong buổi tập gym?'
-  ];
-
   return `
     <div class="topbar">
       <div>
@@ -790,7 +782,7 @@ VIEWS.aiChatBot = async function () {
       <!-- Khung gợi ý câu hỏi -->
       <div style="margin-top: 14px; margin-bottom: 12px;">
         <div style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-          🏋️ Về FitCore & Phòng tập:
+          Câu hỏi thường gặp:
         </div>
         <div class="tag-row" style="margin-bottom: 10px;">
           ${FITCORE_SUGGESTIONS.map(s => `
@@ -799,25 +791,14 @@ VIEWS.aiChatBot = async function () {
             </span>
           `).join('')}
         </div>
-
-        <div style="font-size: 12px; font-weight: 600; color: var(--volt); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-          💡 Câu hỏi ngoài lề, đời sống & kiến thức:
-        </div>
-        <div class="tag-row">
-          ${GENERAL_SUGGESTIONS.map(s => `
-            <span class="chip" style="border-color: rgba(198, 255, 58, 0.25);" onclick="sendAiChatQuick('${s.replace(/'/g, "\\'")}')">
-              ${s}
-            </span>
-          `).join('')}
-        </div>
       </div>
 
-      <!-- Ô nhập câu hỏi tự do -->
+      <!-- Ô nhập câu hỏi -->
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 12px;">
         <input
           id="aichat_input"
           type="text"
-          placeholder="Hỏi bất kỳ điều gì (về gym, lịch tập hoặc câu hỏi ngoài lề, kiến thức, đời sống...)..."
+          placeholder="Nhập câu hỏi của bạn về thẻ tập, lịch tập, bài tập hoặc dinh dưỡng..."
           autocomplete="off"
           style="flex: 1;"
           onkeydown="if(event.key === 'Enter') sendAiChatMessage()"
@@ -829,18 +810,14 @@ VIEWS.aiChatBot = async function () {
       </div>
 
       <!-- Các nút thao tác bổ trợ -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
-        <button class="btn btn-secondary" style="font-size: 13px;" onclick="focusAiChatInput()">
-          + Hỏi câu hỏi khác
-        </button>
-
+      <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 10px;">
         <button class="btn" style="font-size: 12px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="clearAiChatHistory()">
-          🗑️ Xóa lịch sử trò chuyện
+          Xóa lịch sử trò chuyện
         </button>
       </div>
 
       <div class="ai-disclaimer" style="margin-top: 14px;">
-        💡 <strong>Mẹo:</strong> Bạn có thể trò chuyện tự nhiên với trợ lý AI như một người bạn — từ kỹ thuật hít thở, dinh dưỡng cho tới việc quản lý thời gian, công việc hay chuyện phiếm ngoài lề.
+        <strong>Gợi ý:</strong> Bạn có thể hỏi trực tiếp về thời hạn thẻ tập, lịch PT cá nhân, các lớp nhóm hoặc hướng dẫn kỹ thuật bài tập thể hình.
       </div>
     </div>
   `;
@@ -889,7 +866,9 @@ async function renderAiChat() {
     if (!Array.isArray(thread) || !thread.length) {
       el.innerHTML = `
         <div class="empty-state" style="padding: 30px 10px;">
-          <div style="font-size: 26px; margin-bottom: 8px;">🏋️</div>
+          <div style="width: 44px; height: 44px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; background: rgba(255, 107, 0, 0.12); border-radius: 50%; color: #FF6B00;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
           <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Chào bạn! Mình là Tư vấn viên Thể hình FitCore.</div>
           <div style="color: var(--muted); font-size: 13px; max-width: 480px; margin: 0 auto;">
             Bạn có thể chọn nhanh các câu hỏi phía dưới hoặc gửi bất kỳ thắc mắc nào về gói tập, lịch hẹn PT, dinh dưỡng và kỹ thuật bài tập gym.
@@ -906,7 +885,7 @@ async function renderAiChat() {
           return `
             <div style="align-self: ${isUser ? 'flex-end' : 'flex-start'}; max-width: 82%;">
               <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: ${isUser ? 'right' : 'left'};">
-                ${isUser ? 'Bạn' : '🏋️ Tư vấn viên FitCore'}
+                ${isUser ? 'Bạn' : 'Tư vấn viên FitCore'}
               </div>
               <div
                 class="chat-bubble"
@@ -950,6 +929,12 @@ async function renderAiChat() {
    ========================================================= */
 
 function sendAiChatQuick(text) {
+  if (document.getElementById('aichat_thinking_indicator')) {
+    if (typeof showToast === 'function') {
+      showToast('AI đang soạn câu trả lời, vui lòng chờ trong giây lát...', 'info');
+    }
+    return;
+  }
   const input = document.getElementById('aichat_input');
   if (!input) return;
 
@@ -977,7 +962,7 @@ function focusAiChatInput() {
    ========================================================= */
 
 async function clearAiChatHistory() {
-  if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử cuộc trò chuyện AI không?')) {
+  if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử cuộc trò chuyện không?')) {
     return;
   }
 
@@ -1007,6 +992,14 @@ async function sendAiChatMessage() {
 
   if (!question) return;
 
+  // Ngăn gửi trùng lặp khi đang xử lý
+  if (document.getElementById('aichat_thinking_indicator')) {
+    if (typeof showToast === 'function') {
+      showToast('AI đang soạn câu trả lời, vui lòng chờ trong giây lát...', 'info');
+    }
+    return;
+  }
+
   try {
     input.value = '';
     if (btn) btn.disabled = true;
@@ -1032,9 +1025,9 @@ async function sendAiChatMessage() {
     tempThinkingBubble.id = 'aichat_thinking_indicator';
     tempThinkingBubble.style.cssText = 'align-self: flex-start; max-width: 82%;';
     tempThinkingBubble.innerHTML = `
-      <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px;">🤖 FitCore AI</div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px;">Tư vấn viên FitCore</div>
       <div class="chat-bubble" style="background: var(--surface-2); color: var(--chalk); padding: 10px 14px; border-radius: 14px 14px 14px 2px; font-size: 13px; font-style: italic;">
-        ✨ Đang suy nghĩ và soạn câu trả lời...
+        Đang soạn câu trả lời...
       </div>
     `;
     bubbleRow.appendChild(tempThinkingBubble);

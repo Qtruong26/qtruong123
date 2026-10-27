@@ -144,16 +144,82 @@ async function doRegister(event) {
 const handleLogin = doLogin;
 const handleRegister = doRegister;
 
-// Ẩn / Hiện mật khẩu
+// Ẩn / Hiện mật khẩu (Hỗ trợ cả icon thường và SVG hiện đại)
 function togglePasswordVisibility(inputId, icon) {
   const input = document.getElementById(inputId);
   if (!input) return;
-  if (input.type === 'password') {
-    input.type = 'text';
-    if (icon) icon.style.color = '#FF5500';
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  if (icon) {
+    if (icon.style) icon.style.color = isPass ? '#FF7700' : '#64748b';
+    const openEye = icon.querySelector ? icon.querySelector('.eye-open') : null;
+    const closedEye = icon.querySelector ? icon.querySelector('.eye-closed') : null;
+    if (openEye && closedEye) {
+      openEye.style.display = isPass ? 'none' : 'block';
+      closedEye.style.display = isPass ? 'block' : 'none';
+    }
+  }
+}
+
+// Nạp nhanh tài khoản demo 1-chạm cho các vai trò CLB
+function quickFillLogin(username, password, roleName) {
+  switchAuthTab('login');
+  const userInput = document.getElementById('login-username') || document.getElementById('login-phone') || document.getElementById('loginUser');
+  const passInput = document.getElementById('login-password') || document.getElementById('loginPass');
+  if (userInput) userInput.value = username;
+  if (passInput) passInput.value = password;
+  
+  document.querySelectorAll('.demo-role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-role') === username);
+  });
+
+  if (typeof toast === 'function') {
+    toast(`Đã chọn tài khoản: ${roleName} (${username})`);
+  }
+}
+
+// Mở modal tiện ích gym
+function openGymModal(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// Đóng modal tiện ích gym
+function closeGymModal(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// Mô phỏng quét mã QR Check-in hội viên mở cổng
+function simulateQrScan() {
+  const statusEl = document.querySelector('.scanner-status');
+  if (statusEl) {
+    statusEl.textContent = '⚡ Nhận diện thành công: HỘI VIÊN PHẠM HỘI VIÊN (HV1) — MỞ CỬA CÂU LẠC BỘ';
+    statusEl.style.color = '#10B981';
+  }
+  setTimeout(() => {
+    closeGymModal('gymQrModal');
+    quickFillLogin('hv1', '123456', 'Hội viên');
+    doLogin();
+  }, 900);
+}
+
+// Đăng ký nhận vé tập thử 7 ngày VIP
+function submitGymTrial(event) {
+  if (event) event.preventDefault();
+  const name = document.getElementById('trial-name') ? document.getElementById('trial-name').value.trim() : '';
+  const phone = document.getElementById('trial-phone') ? document.getElementById('trial-phone').value.trim() : '';
+  closeGymModal('gymTrialModal');
+  if (typeof toast === 'function') {
+    toast(`Chúc mừng ${name || 'Quý khách'}! Đã nhận mã vé VIP 7 ngày tập thử. Chuyên viên sẽ liên hệ ${phone || 'SĐT'} trong 15 phút.`);
   } else {
-    input.type = 'password';
-    if (icon) icon.style.color = '#64748b';
+    alert(`Chúc mừng ${name || 'Quý khách'}! Đã nhận mã vé VIP 7 ngày tập thử.`);
   }
 }
 
