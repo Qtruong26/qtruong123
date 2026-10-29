@@ -773,7 +773,7 @@ VIEWS.aiChatBot = async function () {
 
     <div class="panel ai-box">
       <!-- Lịch sử hội thoại -->
-      <div id="aichat_output" style="max-height: 480px; min-height: 240px; overflow-y: auto; padding-right: 6px;">
+      <div id="aichat_output" style="max-height: 480px; min-height: 240px; overflow-y: auto; padding-right: 6px; position: relative; scroll-behavior: smooth;">
         <div class="empty-state">
           Đang tải lịch sử hội thoại...
         </div>
@@ -856,7 +856,7 @@ function formatAiMarkdown(text) {
    Render lịch sử chat
    ========================================================= */
 
-async function renderAiChat() {
+async function renderAiChat(shouldScrollToQuestion = false) {
   const el = document.getElementById('aichat_output');
   if (!el) return;
 
@@ -878,12 +878,26 @@ async function renderAiChat() {
       return;
     }
 
+    // Tìm index của câu hỏi người dùng cuối cùng
+    let lastUserIndex = -1;
+    for (let i = thread.length - 1; i >= 0; i--) {
+      if (thread[i] && thread[i].sender === 'user') {
+        lastUserIndex = i;
+        break;
+      }
+    }
+
     el.innerHTML = `
       <div class="chat-bubble-row" style="display: flex; flex-direction: column; gap: 12px;">
-        ${thread.map((c) => {
+        ${thread.map((c, idx) => {
           const isUser = c.sender === 'user';
+          const isLastUser = (idx === lastUserIndex);
           return `
-            <div style="align-self: ${isUser ? 'flex-end' : 'flex-start'}; max-width: 82%;">
+            <div
+              class="${isUser ? 'chat-bubble-user-wrap' : 'chat-bubble-bot-wrap'} ${isLastUser ? 'chat-user-message-last' : ''}"
+              ${isLastUser ? 'id="aichat_last_user_question"' : ''}
+              style="align-self: ${isUser ? 'flex-end' : 'flex-start'}; max-width: 82%; scroll-margin-top: 14px;"
+            >
               <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: ${isUser ? 'right' : 'left'};">
                 ${isUser ? 'Bạn' : 'Tư vấn viên FitCore'}
               </div>
@@ -910,7 +924,11 @@ async function renderAiChat() {
     `;
 
     requestAnimationFrame(() => {
-      el.scrollTop = el.scrollHeight;
+      if (shouldScrollToQuestion || lastUserIndex !== -1) {
+        scrollToAiQuestion();
+      } else {
+        el.scrollTop = el.scrollHeight;
+      }
     });
 
   } catch (err) {
@@ -921,6 +939,42 @@ async function renderAiChat() {
     `;
     console.error('AI chat history error:', err);
   }
+}
+
+
+/* =========================================================
+   Cuộn đến câu hỏi người dùng vừa hỏi
+   ========================================================= */
+
+function scrollToAiQuestion(targetElement) {
+  const outputEl = document.getElementById('aichat_output');
+  if (!outputEl) return;
+
+  const target = targetElement ||
+    outputEl.querySelector('.chat-user-message-last') ||
+    outputEl.querySelector('.chat-bubble-user-wrap:last-of-type');
+
+  if (!target) {
+    outputEl.scrollTo({ top: outputEl.scrollHeight, behavior: 'smooth' });
+    return;
+  }
+
+  // 1. Cuộn khung chat mượt mà đến đúng vị trí câu hỏi vừa hỏi
+  const targetTop = target.offsetTop;
+  outputEl.scrollTo({
+    top: Math.max(0, targetTop - 12),
+    behavior: 'smooth'
+  });
+
+  // 2. Nếu câu hỏi hoặc khung chat đang bị che khuất khỏi màn hình trình duyệt, cuộn nhẹ vào tầm nhìn
+  try {
+    const rect = target.getBoundingClientRect();
+    const isAbove = rect.top < 70;
+    const isBelow = rect.bottom > (window.innerHeight - 50);
+    if (isAbove || isBelow) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  } catch (_) {}
 }
 
 
@@ -1011,8 +1065,15 @@ async function sendAiChatMessage() {
       bubbleRow = outputEl.querySelector('.chat-bubble-row');
     }
 
+    // Xóa class đánh dấu câu hỏi trước đó
+    bubbleRow.querySelectorAll('.chat-user-message-last').forEach((e) => {
+      e.classList.remove('chat-user-message-last');
+    });
+
     const tempUserBubble = document.createElement('div');
-    tempUserBubble.style.cssText = 'align-self: flex-end; max-width: 82%;';
+    tempUserBubble.className = 'chat-bubble-user-wrap chat-user-message-last';
+    tempUserBubble.id = 'aichat_last_user_question';
+    tempUserBubble.style.cssText = 'align-self: flex-end; max-width: 82%; scroll-margin-top: 14px;';
     tempUserBubble.innerHTML = `
       <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px; text-align: right;">Bạn</div>
       <div class="chat-bubble" style="background: var(--volt); color: #10130A; padding: 10px 14px; border-radius: 14px 14px 2px 14px; font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;">
@@ -1032,20 +1093,23 @@ async function sendAiChatMessage() {
     `;
     bubbleRow.appendChild(tempThinkingBubble);
 
-    outputEl.scrollTop = outputEl.scrollHeight;
+    // Cuộn mượt đến câu hỏi vừa gửi
+    requestAnimationFrame(() => {
+      scrollToAiQuestion(tempUserBubble);
+    });
 
     // Gửi request API
     await Api.post('/ai/chat', { question });
 
-    // Cập nhật lại lịch sử hoàn chỉnh
-    await renderAiChat();
+    // Cập nhật lại lịch sử hoàn chỉnh và cuộn đến câu hỏi vừa hỏi
+    await renderAiChat(true);
 
     input.focus();
 
   } catch (err) {
     console.error('Lỗi gửi câu hỏi AI:', err);
     alert(err.message || 'Không thể gửi câu hỏi.');
-    await renderAiChat();
+    await renderAiChat(true);
   } finally {
     if (btn) btn.disabled = false;
   }
